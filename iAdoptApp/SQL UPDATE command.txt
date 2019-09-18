@@ -1,0 +1,4 @@
+UPDATE Users
+   SET UserName = 'Nathaniel'
+ WHERE UserID='12'
+ go

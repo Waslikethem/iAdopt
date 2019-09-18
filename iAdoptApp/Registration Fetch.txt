@@ -1,0 +1,48 @@
+btnRegister =()=>{
+    const data = {
+      //Most be like the Csharp func Code!
+      username: this.state.UserName,
+      password: this.state.Password,
+      email: this.state.Email,
+      fname: this.state.Fname,
+      lname: this.state.Lname,
+      phone: this.state.Phone,
+      region: this.state.RegionCode,
+      gender: this.state.Gender
+    };
+    console.log(data);
+    fetch( WSURL+'/Registration', {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json;',
+      }),  
+      body: JSON.stringify(data)
+    })
+      .then(res => {
+        console.log('res=', res);
+        return res.json()
+      }).then((result) => {
+        let u = JSON.parse(result.d);
+        console.log("u: " + u);
+        this.props.history.push({
+          pathname: '/',
+          search: '?query=Login',})
+        if (u == null) {
+          console.log("There is a Problem!")
+          this.setState({
+            resLabel: "This Email already exists"
+          })
+        }
+        else {
+          this.props.history.push({
+            pathname: '/',
+            search: '?query=Login',
+          })
+        }
+        console.log(result.d);
+        console.log(result);
+      },
+        (error) => {
+          console.log("err post=", error);
+        });
+  }

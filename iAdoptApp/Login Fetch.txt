@@ -1,0 +1,36 @@
+btnLogin = () => {
+    alert('username= ' + this.state.txtUserName, + 'password=' + this.state.txtPassword);
+    const data = {
+      username: this.state.txtUserName,// 'avi', //must be compatible with the WEB SERVICE parameters!!!
+      password: this.state.txtPassword,// '1234'
+    };
+    fetch(URL + '/Login', {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json;',
+      }),
+      body: JSON.stringify(data)
+    })
+      .then(res => {
+        console.log('res=', res);
+        return res.json()
+      })
+      .then(
+        (result) => {
+          console.log("fetch POST= ", result);
+          console.log("fetch POST.d= ", result.d);
+          let u = JSON.parse(result.d);
+          if (u != null) {
+            console.log(u.ID);
+            console.log(u.UserName);
+            console.log(u.Password);
+            console.log(u.FirstName);
+            alert('yep');
+          } else {
+            alert('no such user!');
+          }
+        },
+        (error) => {
+          console.log("err post=", error);
+        });
+  }

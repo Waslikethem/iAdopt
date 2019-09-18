@@ -1,0 +1,7 @@
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\bin\Debug\DALProj.dll.config
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\bin\Debug\DALProj.dll
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\bin\Debug\DALProj.pdb
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\obj\Debug\DALProj.csprojAssemblyReference.cache
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\obj\Debug\DALProj.csproj.CoreCompileInputs.cache
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\obj\Debug\DALProj.dll
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\DALProj\obj\Debug\DALProj.pdb

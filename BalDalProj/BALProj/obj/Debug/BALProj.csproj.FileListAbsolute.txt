@@ -1,0 +1,10 @@
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\bin\Debug\BALProj.dll
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\bin\Debug\BALProj.pdb
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\bin\Debug\DALProj.dll
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\bin\Debug\DALProj.pdb
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\bin\Debug\DALProj.dll.config
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\obj\Debug\BALProj.csprojAssemblyReference.cache
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\obj\Debug\BALProj.csproj.CoreCompileInputs.cache
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\obj\Debug\BALProj.csproj.CopyComplete
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\obj\Debug\BALProj.dll
+C:\Users\Wasli\Desktop\Final Project\BalDalProj\BALProj\obj\Debug\BALProj.pdb
