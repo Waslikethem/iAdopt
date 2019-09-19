@@ -3,7 +3,7 @@ namespace DALProj
 {
     public class Regions
     {
-        public int RegionID { get; set; }
-        public string RegionName { get; set; }
+        public int value { get; set; }
+        public string label { get; set; }
     }
 }

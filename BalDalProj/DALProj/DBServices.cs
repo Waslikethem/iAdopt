@@ -116,8 +116,8 @@ namespace DALProj
             {
                 r = new Regions()
                 {
-                    RegionID = int.Parse(reader["RegionID"].ToString()),
-                    RegionName = reader["RegionName"].ToString(),
+                    value = int.Parse(reader["RegionID"].ToString()),
+                    label = reader["RegionName"].ToString(),
                 };
                 regions.Add(r);
             }
