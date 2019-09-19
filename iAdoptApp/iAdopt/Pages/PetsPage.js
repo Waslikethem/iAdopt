@@ -9,6 +9,10 @@ export default class Pets extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            //User Interface
+            profilePic: require('../Images/noPic.png'),
+            userName: 'אופיר לוי',
+            //Misc
             selectedIndex: 1,
             sortByRace: false,
             sortByGender: false,
@@ -18,7 +22,7 @@ export default class Pets extends React.Component {
             page: 1,
             error: null,
             title: 'אמץ בעל חיים',
-            subTitle:''
+            subTitle: ''
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
@@ -40,7 +44,7 @@ export default class Pets extends React.Component {
         this.loadPets();
     }
     loadPets = () => {
-        fetch(URL + "/GetPetsDetails", {
+        fetch(URL + "/GetPetsTable", {
             method: "post",
             headers: new Headers({
                 "Content-Type": "application/json;"
@@ -68,10 +72,18 @@ export default class Pets extends React.Component {
     render() {
         const buttons = ['Cats', 'Dogs', 'All']
         const { selectedIndex } = this.state
+        v = require('../Images/noPic.png')
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text>Header</Text>
+                    <TouchableOpacity>
+                        <Image
+                            style={styles.profilePic}
+                            source={this.state.profilePic}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.userNameProfileName}>{this.state.userName}</Text>
+
                 </View>
                 <Text style={styles.titleCss}>{this.state.title}</Text>
                 <ButtonGroup
@@ -103,10 +115,10 @@ export default class Pets extends React.Component {
                     />
                 </View>
                 <View style={styles.publishPet}>
-                <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
+                    <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
                 </View>
                 {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}
-               {/*<View style={styles.footer}></View>*/} 
+                {/*<View style={styles.footer}></View>*/}
             </View>
         );
     }
@@ -120,23 +132,36 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     header: {
-        position:'absolute',
-        top:0,
-        height:60,
+        flexDirection: 'row',
+        position: 'absolute',
+        marginTop: 24,
+        top: 0,
+        height: 40,
         width: '100%',
         borderBottomWidth: 0.5
     },
+    profilePic: {
+        marginTop: 3,
+        marginRight: 3,
+        height: 32,
+        width: 32
+    },
+    userNameProfileName: {
+        marginTop: 12,
+        fontSize:14,
+        color:'blue'
+    },
     footer: {
-        position:'absolute',
-        bottom:0,
-        height:35,
+        position: 'absolute',
+        bottom: 0,
+        height: 35,
         width: '100%',
         backgroundColor: 'green',
-       // justifyContent:'flex-end',
+        // justifyContent:'flex-end',
     },
-    publishPet:{
-        position:'absolute',
-        bottom:20
+    publishPet: {
+        position: 'absolute',
+        bottom: 20
     },
     titleCss: {
         fontSize: 16,
@@ -163,7 +188,7 @@ const styles = StyleSheet.create({
     },
     flatListWindow: {
         height: 250,
-        marginBottom:155
+        marginBottom: 155
         //marginRight:5
     },
     checkBoxContainer: {
