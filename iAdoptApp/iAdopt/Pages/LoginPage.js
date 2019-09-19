@@ -38,9 +38,10 @@ export default class Login extends React.Component {
         //Checks if the user already exists in the phone memory
         AsyncStorage.getItem("isMember", (err, result) => {
             console.log(result);
-            this.setState({ isMember: result });
-            if (this.state.flag == true) {
-                this.props.navigation.navigate("HomePage");
+            this.setState({ isMember: JSON.parse(result) });
+            if (this.state.isMember == true) {
+                //this.props.navigation.navigate("HomePage");
+                Alert.alert('We Remember You :D');
             }
         });
     }
@@ -131,7 +132,7 @@ export default class Login extends React.Component {
     }
     saveUser = async () => {
         try {
-            await AsyncStorage.setItem("isMember", Bool(true));
+            await AsyncStorage.setItem("isMember", JSON.stringify(true));
             await AsyncStorage.setItem("userPassword", String(this.state.userID));
             await AsyncStorage.setItem("userName", this.state.userName);
             await AsyncStorage.setItem("userEmail", this.state.userEmail);
@@ -141,7 +142,8 @@ export default class Login extends React.Component {
             await AsyncStorage.setItem("userRegion", String(this.state.userRegion));
             await AsyncStorage.setItem("userGender", this.state.userGender);
             await AsyncStorage.setItem("userImage", this.state.userImage);
-            this.navToHomePage();
+            Alert.alert('התחברת בהצלחה');
+            //this.navToHomePage();
         } catch (error) {
             alert(error);
         }
@@ -172,6 +174,9 @@ export default class Login extends React.Component {
     navToHomePage = () => {
         this.props.navigation.navigate("HomePage");
     }
+    deleteAsyncStorage=async()=>{
+        AsyncStorage.clear();
+    }
     render() {
         return (
             <View style={styles.container}>
@@ -199,6 +204,7 @@ export default class Login extends React.Component {
                     </View>
                     <Button buttonStyle={{ backgroundColor: 'orange', marginTop: 30 }} title='התחבר' onPress={this.btnLogin} />
                     <Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='לא רשום עדיין?' onPress={this.navToRegistrationPage} />
+                    {/*<Button buttonStyle={{ backgroundColor: 'purple', marginTop: 30 }} title='Delete AsyncStorage' onPress={this.deleteAsyncStorage} />*/}
                     {/*
                     <Button buttonStyle={{ backgroundColor: 'green', marginTop: 30 }} title='בחר תמונה' onPress={this.btnOpenGallery} />
                     <Button buttonStyle={{ backgroundColor: 'blue', marginTop: 30 }} title='הצגת כתובת תמונה' onPress={this.showImgUrl} />

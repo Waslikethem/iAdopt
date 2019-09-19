@@ -16,7 +16,6 @@ export default class Registration extends React.Component {
             title: 'יצירת פרופיל',
             //Handle Spaces In Labels
             indexSpacer: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
-            indexSpacer2: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
             //User Registration
             userName: '',
             userPass: '',
@@ -29,12 +28,40 @@ export default class Registration extends React.Component {
             selectedGender: 0,
             userGender: 'm',
             //Regions
-            regions: [],
+            regions: []
 
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
-
+    async componentDidMount() {
+        //Retrieve Regions Table
+        await this.retrieveRegionsTable();
+    }
+    retrieveRegionsTable = async () => {
+        fetch(URL + "/GetRegionsTable", {
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json;"
+            }),
+            body: JSON.stringify()
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(
+                result => {
+                    let r = JSON.parse(result.d);
+                    if (r != null) {
+                        this.setState({ regions: r }, function () { console.log(this.state.regions) });
+                    } else {
+                        alert('error');
+                    }
+                },
+                error => {
+                    console.log("err post=", error);
+                }
+            );
+    }
 
     btnRegister = () => {
         //First Validation on Passwords
@@ -151,7 +178,6 @@ export default class Registration extends React.Component {
                 }
             );
     }
-
     render() {
         const buttons = ['זכר', 'נקבה']
         const { selectedGender } = this.state
@@ -208,16 +234,10 @@ export default class Registration extends React.Component {
                     />
                     <RNPickerSelect
                         placeholder={{ label: this.state.indexSpacer + 'בחר אזור', value: null }}
-                        onValueChange={(value) => this.regionPicker(value)}
-                        items={[
-                            { label: this.state.indexSpacer2 + 'צפון', value: '1' },
-                            { label: this.state.indexSpacer2 + 'חיפה', value: '2' },
-                            { label: this.state.indexSpacer2 + 'תל אביב', value: '3' },
-                            { label: this.state.indexSpacer2 + 'מרכז', value: '4' },
-                            { label: this.state.indexSpacer2 + 'ירושלים', value: '5' },
-                            { label: this.state.indexSpacer2 + 'דרום', value: '6' },
-                        ]}
+                        onValueChange={(value) => {this.setState({userRegion:value})}}
+                        items={this.state.regions}
                     />
+
                     <View style={{ marginTop: 10, alignSelf: 'center' }}>
                         <ButtonGroup
                             onPress={this.updateIndex}
