@@ -22,14 +22,14 @@ public class WebService : System.Web.Services.WebService
         //InitializeComponent(); 
     }
     [WebMethod]
-    public string GetPetsDetails()
+    public string GetPetsTable()
     {
-        return BALServices.GetPetsDetails();
+        return BALServices.GetPetsTable();
     }
     [WebMethod]
-    public string GetVeterianriansDetails()
+    public string GetVeterianriansTable()
     {
-        return BALServices.GetVeterianriansDetails();
+        return BALServices.GetVeterianriansTable();
     }
     [WebMethod]
     public string GetRegionsTable()
@@ -56,8 +56,11 @@ public class WebService : System.Web.Services.WebService
         }
         else return string.Empty;
     }
-
-
+    [WebMethod]
+    public string UpdateUser(string userID, string password, string email, string phone, int regionCode)
+    {
+        return BALServices.UpdateUser(userID, password, email, phone, regionCode);
+    }
     public string StoreImage(string base64, string imgName, string imageType)
     {
         try

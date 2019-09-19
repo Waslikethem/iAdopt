@@ -53,9 +53,8 @@ namespace DALProj
             }
             return string.Empty;
         }
-
         //שליפת טבלת חיות המחמד
-        public static List<Pets> GetPetsDetails()
+        public static List<Pets> GetPetsTable()
         {
             List<Pets> pets = new List<Pets>();
             Pets p = null;
@@ -74,7 +73,7 @@ namespace DALProj
                     UserCode = int.Parse(reader["UserCode"].ToString()),
                     Gender = char.Parse(reader["Gender"].ToString()),
                     Vaccines = reader["Vaccines"].ToString(),
-                    Image = reader["Image"].ToString(),
+                    Image = reader["Image"].ToString()
                 };
                 pets.Add(p);
             }
@@ -82,7 +81,7 @@ namespace DALProj
             return pets;
         }
         //שליפת טבלת וטרינרים
-        public static List<Veterianrians> GetVeterianriansDetails()
+        public static List<Veterianrians> GetVeterianriansTable()
         {
             List<Veterianrians> vets = new List<Veterianrians>();
             Veterianrians v = null;
@@ -144,7 +143,8 @@ namespace DALProj
                 {
                     if (!reader.IsClosed)
                         reader.Close();
-                    comm.CommandText = $"INSERT INTO Users(UserName,Password,Email,Fname,Lname,Phone,RegionCode,Gender,UserImage)VALUES('{userName}','{password}','{email}','{fName}','{lName}','{phone}',{regionCode},'{gender}','')";
+                    comm.CommandText = $"INSERT INTO Users(UserName,Password,Email,Fname,Lname,Phone,RegionCode,Gender,UserImage)VALUES" +
+                    $"('{userName}','{password}','{email}','{fName}','{lName}','{phone}',{regionCode},'{gender}','')";
                     int res = comm.ExecuteNonQuery();
                     if (res == 1)
                     {
@@ -209,7 +209,7 @@ namespace DALProj
                     Fname = reader["Fname"].ToString(),
                     Lname = reader["Lname"].ToString(),
                     Gender = reader["Gender"].ToString(),
-
+                    UserImage = reader["UserImage"].ToString()
                 };
             }
             comm.Connection.Close();
@@ -233,6 +233,30 @@ namespace DALProj
             }
             comm.Connection.Close();
             return u;
+        }
+        //עידכון משתמש
+        public static User UpdateUser(string userID, string password, string email, string phone, int regionCode)
+        {
+            User u = null;
+            comm.CommandText = $"UPDATE Users" +
+                   $" SET Password='{password}' ,Email='{email}',Phone='{phone}',RegionCode='{regionCode}'WHERE UserID='{userID}'";
+            comm.Connection.Open();
+            int res = comm.ExecuteNonQuery();
+            if (res == 1)
+            {
+                u = new User()
+                {
+                    UserID = int.Parse(userID),
+                    Password = password,
+                    Email = email,
+                    Phone = phone,
+                    RegionCode = regionCode,
+
+                };
+            }
+            comm.Connection.Close();
+            return u;
+
         }
     }
 }

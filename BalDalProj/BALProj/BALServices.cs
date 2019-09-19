@@ -12,13 +12,13 @@ namespace BALProj
             User u = DBServices.Login(userNameOrEmail, userPass);
             return new JavaScriptSerializer().Serialize(u);
         }
-        public static string GetPetsDetails()
+        public static string GetPetsTable()
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetPetsDetails());
+            return new JavaScriptSerializer().Serialize(DBServices.GetPetsTable());
         }
-        public static string GetVeterianriansDetails()
+        public static string GetVeterianriansTable()
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetVeterianriansDetails());
+            return new JavaScriptSerializer().Serialize(DBServices.GetVeterianriansTable());
         }
         public static string GetRegionsTable()
         {
@@ -33,6 +33,10 @@ namespace BALProj
         {
             User u = DBServices.SaveUserImage(userID, imgPath);
             return new JavaScriptSerializer().Serialize(u);
+        }
+        public static string UpdateUser(string userID, string password, string email, string phone, int regionCode)
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.UpdateUser(userID, password, email, phone, regionCode));
         }
     }
 }
