@@ -16,6 +16,7 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
+    //LoginPage,
     RegistrationPage,
     //HomePage,
     LoginPage,

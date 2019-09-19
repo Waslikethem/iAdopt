@@ -32,9 +32,14 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetVeterianriansDetails();
     }
     [WebMethod]
+    public string GetRegionsTable()
+    {
+        return BALServices.GetRegionsTable();
+    }
+    [WebMethod]
     public string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
     {
-        return BALServices.Register(userName, password, email, fName, lName, phone, regionCode, gender);
+        return BALServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender);
     }
     [WebMethod]
     public string Login(string userNameOrEmail, string userPass)

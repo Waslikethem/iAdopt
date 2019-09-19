@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
-import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox, Input,SocialIcon } from "react-native-elements";
+import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox, Input, SocialIcon } from "react-native-elements";
 import RNPickerSelect from 'react-native-picker-select';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -12,10 +12,12 @@ export default class Registration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            //Screen
+            title: 'יצירת פרופיל',
             //Handle Spaces In Labels
             indexSpacer: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
             indexSpacer2: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
-            //User Registration Values
+            //User Registration
             userName: '',
             userPass: '',
             verifyPass: '',
@@ -24,14 +26,15 @@ export default class Registration extends React.Component {
             userLastName: '',
             userPhone: '',
             userRegion: 0,
-            selectedGender:0,
+            selectedGender: 0,
             userGender: 'm',
-            //Interface
-            title: 'יצירת פרופיל'
+            //Regions
+            regions: [],
 
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
+
 
     btnRegister = () => {
         //First Validation on Passwords
@@ -39,56 +42,56 @@ export default class Registration extends React.Component {
             Alert.alert('אימות הסיסמא לא עבר בהצלחה');
             return;
         }
-        if(this.state.userEmail === ''){
+        if (this.state.userEmail === '') {
             Alert.alert('שורת האימייל ריקה');
             return;
         }
-        //Second Validation on Email
-        if 
-        ((this.state.userEmail.toUpperCase().includes('@GMAIL.COM')) ||(this.state.userEmail.toUpperCase().includes('@YAHOO.COM')) || (this.state.userEmail.toUpperCase().includes('@WALLA.CO.IL'))
-        ) {
-                //FETCH
-                const data = {
-                  //Most be like the Csharp func Code!
-                  userName: this.state.userName,
-                  password: this.state.userPass,
-                  email: this.state.userEmail,
-                  fName: this.state.userFirstName,
-                  lName: this.state.userLastName,
-                  phone: this.state.userPhone,
-                  regionCode: this.state.userRegion,
-                  gender: this.state.userGender
-                };
-                console.log(data);
-                fetch( URL+'/Registration', {
-                  method: 'post',
-                  headers: new Headers({
-                    'Content-Type': 'application/json;',
-                  }),  
-                  body: JSON.stringify(data)
-                })
-                  .then(res => {
-                    console.log('res=', res);
-                    return res.json()
-                  }).then((result) => {
-                    let u = JSON.parse(result.d);
-                    if (u == null) {
-                        this.setState({userFirstName:u.Fname})
-                      console.log("There is a Problem!")
-                      this.setState({
-                        resLabel: "This Email already exists"
-                      })
-                    }
-                  },
-                    (error) => {
-                      console.log("err post=", error);
-                    });
-            Alert.alert('נירשמת בהצלחה');
+        if (this.state.userRegion == 0) {
+            Alert.alert('אנא בחר אזור');
+            return;
         }
-        else{
+        if
+            ((this.state.userEmail.toUpperCase().includes('@GMAIL.COM')) || (this.state.userEmail.toUpperCase().includes('@YAHOO.COM')) || (this.state.userEmail.toUpperCase().includes('@WALLA.CO.IL'))
+        ) {
+            console.log('UserName: ' + this.state.userName + ' Password: ' + this.state.userPass + ' Email: ' + this.state.userEmail +
+                ' FName: ' + this.state.userFirstName + ' LName: ' + this.state.userLastName + ' Phone: ' + this.state.userPhone +
+                ' RegionCode: ' + this.state.userRegion + ' Gender: ' + this.state.userGender);
+            //FETCH
+            const data = {
+                //Most be like the Csharp func Code!
+                userName: this.state.userName,
+                password: this.state.userPass,
+                email: this.state.userEmail,
+                fName: this.state.userFirstName,
+                lName: this.state.userLastName,
+                phone: this.state.userPhone,
+                regionCode: this.state.userRegion,
+                gender: this.state.userGender
+            };
+            console.log(data);
+            fetch(URL + '/Registration', {
+                method: 'post',
+                headers: new Headers({
+                    'Content-Type': 'application/json;',
+                }),
+                body: JSON.stringify(data)
+            }).then(res => {
+                console.log('res=', res);
+                return res.json()
+            }).then(() => {
+                Alert.alert('הרשמה בוצעה בהצלחה')
+                this.navToLoginPage();
+            }, (error) => {
+                console.log("err post=", error);
+            });
+        }
+        else {
             Alert.alert('האימייל אינו תקין');
             return;
-        } 
+        }
+    }
+    navToLoginPage = () => {
+        this.props.navigation.navigate("LoginPage");
     }
     txtUserName = (e) => {
         this.setState({ userName: e });
@@ -113,16 +116,42 @@ export default class Registration extends React.Component {
     }
     updateIndex(selectedGender) {
         this.setState({ selectedGender })
-        if(selectedGender==0){
-            this.setState({userGender:'m'},function(){Alert.alert(this.state.userGender)})
+        if (selectedGender == 0) {
+            this.setState({ userGender: 'm' }, function () { Alert.alert(this.state.userGender) })
         }
-        else{
-            this.setState({userGender:'f'},function(){Alert.alert(this.state.userGender)})
+        else {
+            this.setState({ userGender: 'f' }, function () { Alert.alert(this.state.userGender) })
         }
     }
-    regionPicker=(value)=>{
-        this.setState({userRegion:value},function(){Alert.alert(this.state.userRegion)})
+    regionPicker = (value) => {
+        this.setState({ userRegion: value }, function () { Alert.alert(this.state.userRegion) })
     }
+    loadRegions = () => {
+        fetch(URL + "/GetRegionsTable", {
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json;"
+            }),
+            body: JSON.stringify()
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(
+                result => {
+                    let p = JSON.parse(result.d);
+                    if (p != null) {
+                        this.setState({ regions: p }, function () { console.log(regions) });
+                    } else {
+                        alert('error');
+                    }
+                },
+                error => {
+                    console.log("err post=", error);
+                }
+            );
+    }
+
     render() {
         const buttons = ['זכר', 'נקבה']
         const { selectedGender } = this.state
@@ -155,7 +184,7 @@ export default class Registration extends React.Component {
                     />
                     <Input
                         onChangeText={this.txtUserEmail}
-                        maxLength={12}
+                        maxLength={24}
                         placeholder='אימייל'
                         errorStyle={{ color: 'red' }}
                     />
@@ -218,7 +247,7 @@ const styles = StyleSheet.create({
     },
     logo: {
         //marginRight: 100,
-        marginBottom:8
+        marginBottom: 8
     },
     input: {
         width: 200

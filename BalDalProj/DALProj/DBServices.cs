@@ -54,7 +54,7 @@ namespace DALProj
             return string.Empty;
         }
 
-        //שליפת הטבלה של החיות מחמד
+        //שליפת טבלת חיות המחמד
         public static List<Pets> GetPetsDetails()
         {
             List<Pets> pets = new List<Pets>();
@@ -81,7 +81,7 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
-        //שליפת הטבלה של הוטרינרים
+        //שליפת טבלת וטרינרים
         public static List<Veterianrians> GetVeterianriansDetails()
         {
             List<Veterianrians> vets = new List<Veterianrians>();
@@ -104,6 +104,26 @@ namespace DALProj
             }
             comm.Connection.Close();
             return vets;
+        }
+        //שליפת טבלת האזורים בארץ
+        public static List<Regions> GetRegionsTable()
+        {
+            List<Regions> regions = new List<Regions>();
+            Regions r = null;
+            comm.CommandText = $"SELECT * FROM Regions";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                r = new Regions()
+                {
+                    RegionID = int.Parse(reader["RegionID"].ToString()),
+                    RegionName = reader["RegionName"].ToString(),
+                };
+                regions.Add(r);
+            }
+            comm.Connection.Close();
+            return regions;
         }
         //הרשמה של משתמש אל האפליקציה
         public static User Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)

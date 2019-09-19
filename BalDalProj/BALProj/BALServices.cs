@@ -20,7 +20,11 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetVeterianriansDetails());
         }
-        public static string Register(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
+        public static string GetRegionsTable()
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.GetRegionsTable());
+        }
+        public static string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
         {
             User u = DBServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender);
             return new JavaScriptSerializer().Serialize(u);

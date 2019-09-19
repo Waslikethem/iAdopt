@@ -12,22 +12,138 @@ export default class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            //Screen
+            title: 'התחברות לאפליקציה',
+            //User
+            userID: 0,
             userName: '',
             userPassword: '',
+            userEmail: '',
+            userFirstName: '',
+            userLastName: '',
+            userPhone: '',
+            userRegion: 0,
+            userGender: '',
+            userImage: '',
+            //AsyncStorage
+            isMember: false,
+            //Picture
             pic64base: '',
             picName64base: '',
             picUri: '',
             img: ' ',
-            title: 'התחברות לאפליקציה'
         }
     }
-    btnLogin = () => {
-        if (this.state.userName == "Nati" && this.state.userPassword == "123") {
-            Alert.alert('Login Success');
-            return;
+    componentDidMount() {
+        //Checks if the user already exists in the phone memory
+        AsyncStorage.getItem("isMember", (err, result) => {
+            console.log(result);
+            this.setState({ isMember: result });
+            if (this.state.flag == true) {
+                this.props.navigation.navigate("HomePage");
+            }
+        });
+    }
+    /*
+    btnOpenGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 0.1,
+            base64: true
+        });
+
+        if (!result.canclelled) {
+            this.setState({
+                img: result.uri,
+                base64: result.base64,
+                imgType: result.type
+            });
         }
-        else {
-            Alert.alert('Login Failed');
+    };
+    showImgUrl = () => {
+        const data = {
+            userID: '1',
+            base64: this.state.base64,
+            imageName: 'Ofir',
+            imageType: this.state.imgType
+        }
+        console.log(data);
+        fetch(URL_DEV + '/SaveImage', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/json;',
+            }),
+            body: JSON.stringify(data)
+        }).then(res => {
+            console.log('res=', res);
+            return res.json()
+        }).then((result) => {
+            let u = JSON.parse(result.d);
+            console.log(u);
+        },
+            (error) => {
+                console.log("err post=", error);
+            });
+    }
+    */
+    btnLogin = () => {
+        const data = {
+            //Most be like the Csharp func Code!
+            userNameOrEmail: this.state.userName,
+            userPass: this.state.userPassword,
+        };
+        fetch(URL + '/Login', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/json;',
+            }),
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                console.log('res=', res);
+                return res.json()
+            })
+            .then(
+                (result) => {
+                    let u = JSON.parse(result.d);
+                    if (u != null) {
+                        this.setState({
+                            userID: u.UserID,
+                            userName: u.UserName,
+                            userPassword: u.Password,
+                            userEmail: u.Email,
+                            userFirstName: u.Fname,
+                            userLastName: u.Lname,
+                            userPhone: u.Phone,
+                            userRegion: u.RegionCode,
+                            userGender: u.Gender,
+                            userImage: u.UserImage,
+                            isMember: true
+                        }, function () { this.saveUser() })
+                    }
+                    else {
+                        Alert.alert('שם משתמש או סיסמא אינם נכונים')
+                    }
+                },
+                (error) => {
+                    console.log("err post=", error);
+                });
+    }
+    saveUser = async () => {
+        try {
+            await AsyncStorage.setItem("isMember", Bool(true));
+            await AsyncStorage.setItem("userPassword", String(this.state.userID));
+            await AsyncStorage.setItem("userName", this.state.userName);
+            await AsyncStorage.setItem("userEmail", this.state.userEmail);
+            await AsyncStorage.setItem("userFirstName", this.state.userFirstName);
+            await AsyncStorage.setItem("userLastName", this.state.userLastName);
+            await AsyncStorage.setItem("userPhone", this.state.userPhone);
+            await AsyncStorage.setItem("userRegion", String(this.state.userRegion));
+            await AsyncStorage.setItem("userGender", this.state.userGender);
+            await AsyncStorage.setItem("userImage", this.state.userImage);
+            this.navToHomePage();
+        } catch (error) {
+            alert(error);
         }
     }
     btnOpenGallery = async () => {
@@ -36,11 +152,6 @@ export default class Login extends React.Component {
             quality: 0.1,
             base64: true
         });
-        // this.setState({
-        // pic64base: photo.base64,
-        // picName64base: 'image1_' + new Date().getTime() + '.jpg',
-        //picUri: `data:image/gif;base64,${photo.base64}`,
-        //  });
         if (!result.canclelled) {
             this.setState({ img: result.uri });
         }
@@ -57,6 +168,9 @@ export default class Login extends React.Component {
     }
     navToRegistrationPage = () => {
         this.props.navigation.navigate("RegistrationPage");
+    }
+    navToHomePage = () => {
+        this.props.navigation.navigate("HomePage");
     }
     render() {
         return (
@@ -85,8 +199,10 @@ export default class Login extends React.Component {
                     </View>
                     <Button buttonStyle={{ backgroundColor: 'orange', marginTop: 30 }} title='התחבר' onPress={this.btnLogin} />
                     <Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='לא רשום עדיין?' onPress={this.navToRegistrationPage} />
+                    {/*
                     <Button buttonStyle={{ backgroundColor: 'green', marginTop: 30 }} title='בחר תמונה' onPress={this.btnOpenGallery} />
                     <Button buttonStyle={{ backgroundColor: 'blue', marginTop: 30 }} title='הצגת כתובת תמונה' onPress={this.showImgUrl} />
+                    */}
                 </KeyboardAvoidingView>
             </View>
         );
@@ -114,7 +230,7 @@ const styles = StyleSheet.create({
     },
     titleCss: {
         fontSize: 16,
-        marginTop:3
+        marginTop: 3
     },
     logo: {
         marginTop: 35
