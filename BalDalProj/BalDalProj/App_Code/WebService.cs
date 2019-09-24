@@ -49,23 +49,27 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public string SaveImage(string userID, string base64, string imageName, string imageType)
     {
-        string imgPath = StoreImage(base64, imageName, imageType);
-        if (imgPath != string.Empty)
+        string imgPath;
+        try
         {
+            imgPath = StoreImage(base64, imageName, imageType, "Users");
             return BALServices.SaveUserImage(userID, imgPath);
         }
-        else return string.Empty;
+        catch (Exception e)
+        {
+            return e.Message;
+        }
     }
     [WebMethod]
     public string UpdateUser(string userID, string password, string email, string phone, int regionCode)
     {
         return BALServices.UpdateUser(userID, password, email, phone, regionCode);
     }
-    public string StoreImage(string base64, string imgName, string imageType)
+    public string StoreImage(string base64, string imgName, string imageType, string folder)
     {
         try
         {
-            String path = HttpContext.Current.Server.MapPath("~/ImageStorage"); //Path
+            String path = HttpContext.Current.Server.MapPath("~/ImageStorage/" + folder); //Path
 
             //Check if directory exist
             if (!System.IO.Directory.Exists(path))
@@ -82,11 +86,11 @@ public class WebService : System.Web.Services.WebService
 
             File.WriteAllBytes(imgPath, imageBytes);
 
-            return imgPath;
+            return $"{folder}/{imgName}.{imageType}";
         }
         catch (Exception e)
         {
-            return string.Empty;
+            return e.Message;
         }
     }
 }
