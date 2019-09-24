@@ -72,8 +72,8 @@ export default class Pets extends React.Component {
             this.setState({
                 userPic: IMAGE_URL + u.UserImage,
                 member: m
-            },function(){
-                console.log("userPic="+this.state.userPic);
+            }, function () {
+                console.log("userPic=" + this.state.userPic);
             });
         },
             (error) => {
@@ -101,7 +101,7 @@ export default class Pets extends React.Component {
             if (result != null) {
                 this.setState({ member: JSON.parse(result) });
                 if (this.state.member.UserImage != null)
-                    this.setState({ userPic: IMAGE_URL + this.state.member.UserImage },function(){Alert.alert("userPic="+this.state.userPic)});
+                    this.setState({ userPic: IMAGE_URL + this.state.member.UserImage }, function () { Alert.alert("userPic=" + this.state.userPic) });
             }
         });
         // AsyncStorage.getItem("userPic", (err, result) => {
@@ -147,7 +147,7 @@ export default class Pets extends React.Component {
                     <TouchableOpacity>
                         <Image
                             style={styles.profilePic}
-                            source={{uri: this.state.userPic}}
+                            source={{ uri: this.state.userPic + '?time' + new Date() }}
                         />
                     </TouchableOpacity>
                     <Text style={styles.userNameProfileName}>{this.state.userName}</Text>
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         marginTop: 30
     },
     profilePic: {
-        borderRadius:25,
+        borderRadius: 25,
         marginTop: 3,
         marginRight: 3,
         height: 32,
