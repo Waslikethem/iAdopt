@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
 import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox } from "react-native-elements";
+import * as ImagePicker from "expo-image-picker";
 import { Col, Row, Grid } from "react-native-easy-grid";
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
+const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
 export default class Pets extends React.Component {
 
@@ -10,10 +12,10 @@ export default class Pets extends React.Component {
         super(props);
         this.state = {
             //User Interface
-            profilePic: require('../Images/noPic.png'),
+            userPic: IMAGE_URL + 'noPic.png',
             userName: 'אופיר לוי',
             //Misc
-            selectedIndex: 1,
+            selectedIndex: 2,
             sortByRace: false,
             sortByGender: false,
             sortByAge: false,
@@ -26,6 +28,59 @@ export default class Pets extends React.Component {
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
+
+    btnOpenGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 0.1,
+            base64: true
+        });
+
+        if (!result.canclelled) {
+            this.setState({
+                img: result.uri,
+                base64: result.base64,
+                imgType: 'jpeg'
+            });
+
+            this.showImgUrl();
+
+        }
+    };
+    showImgUrl = () => {
+        const data = {
+            userID: this.state.member.UserID,
+            base64: this.state.base64,
+            imageName: this.state.member.UserID,
+            imageType: this.state.imgType
+        }
+        console.log(data);
+        fetch(URL + '/SaveImage', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/json;',
+            }),
+            body: JSON.stringify(data)
+        }).then(res => {
+            console.log('res=', res);
+            return res.json()
+        }).then((result) => {
+            let u = JSON.parse(result.d);
+            console.log(u);
+            let m = this.state.member;
+            m.UserImage = u.UserImage;
+            this.setState({
+                userPic: IMAGE_URL + u.UserImage,
+                member: m
+            },function(){
+                console.log("userPic="+this.state.userPic);
+            });
+        },
+            (error) => {
+                console.log("err post=", error);
+            });
+    }
+
 
     updateIndex(selectedIndex) {
         this.setState({ selectedIndex })
@@ -41,6 +96,20 @@ export default class Pets extends React.Component {
         console.log(this.state.pets);
     }
     componentDidMount() {
+        AsyncStorage.getItem("member", (err, result) => {
+            console.log("result (member) = " + result);
+            if (result != null) {
+                this.setState({ member: JSON.parse(result) });
+                if (this.state.member.UserImage != null)
+                    this.setState({ userPic: IMAGE_URL + this.state.member.UserImage },function(){Alert.alert("userPic="+this.state.userPic)});
+            }
+        });
+        // AsyncStorage.getItem("userPic", (err, result) => {
+        //     console.log("result (userPic) = " + result);
+        //     if (result != null) {
+        //         this.setState({ userPic: JSON.parse(result) });
+        //     }
+        // });
         this.loadPets();
     }
     loadPets = () => {
@@ -68,7 +137,6 @@ export default class Pets extends React.Component {
                 }
             );
     }
-
     render() {
         const buttons = ['Cats', 'Dogs', 'All']
         const { selectedIndex } = this.state
@@ -79,13 +147,15 @@ export default class Pets extends React.Component {
                     <TouchableOpacity>
                         <Image
                             style={styles.profilePic}
-                            source={this.state.profilePic}
+                            source={{uri: this.state.userPic}}
                         />
                     </TouchableOpacity>
                     <Text style={styles.userNameProfileName}>{this.state.userName}</Text>
 
                 </View>
-                <Text style={styles.titleCss}>{this.state.title}</Text>
+                <View style={styles.titleCss}>
+                    <Text>{this.state.title}</Text>
+                </View>
                 <ButtonGroup
                     onPress={this.updateIndex}
                     selectedIndex={selectedIndex}
@@ -106,8 +176,8 @@ export default class Pets extends React.Component {
                         extraData={this.state}
                         renderItem={({ item }) => <View style={{ margin: 20 }}>
                             <View style={styles.gridTable}>
-                                <Text onPress={this.showAlert.bind(this, item)}>שם:{item.Name} גיל:{item.Age}{'\n'} גזע:{item.RaceCode}
-                                    {'\n'} חיסונים:{item.Vaccines}</Text>
+                                <Text onPress={this.showAlert.bind(this, item)}>שם: {item.Name} גיל: {item.Age}{'\n'} גזע: {item.RaceCode}
+                                    {'\n'}חיסונים: {item.Vaccines}</Text>
                             </View>
                         </View>}
                         numColumns={2}
@@ -115,6 +185,7 @@ export default class Pets extends React.Component {
                     />
                 </View>
                 <View style={styles.publishPet}>
+                    <Button buttonStyle={{ backgroundColor: 'green' }} title='העלה תמונה לשרת' onPress={this.btnOpenGallery} />
                     <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
                 </View>
                 {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}
@@ -138,9 +209,14 @@ const styles = StyleSheet.create({
         top: 0,
         height: 40,
         width: '100%',
-        borderBottomWidth: 0.5
+        //borderBottomWidth: 0.5,
+        //borderBottomColor:'grey'
+    },
+    titleCss: {
+        marginTop: 30
     },
     profilePic: {
+        borderRadius:25,
         marginTop: 3,
         marginRight: 3,
         height: 32,
@@ -148,8 +224,8 @@ const styles = StyleSheet.create({
     },
     userNameProfileName: {
         marginTop: 12,
-        fontSize:14,
-        color:'blue'
+        fontSize: 14,
+        color: 'blue'
     },
     footer: {
         position: 'absolute',
@@ -165,6 +241,7 @@ const styles = StyleSheet.create({
     },
     titleCss: {
         fontSize: 16,
+        fontFamily: 'sans-serif'
     },
     logo: {
         marginTop: 20
@@ -187,7 +264,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'yellow'
     },
     flatListWindow: {
-        height: 250,
+        height: 300,
         marginBottom: 155
         //marginRight:5
     },

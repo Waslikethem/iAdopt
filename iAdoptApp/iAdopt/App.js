@@ -16,21 +16,19 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
-    //LoginPage,
-    RegistrationPage,
-    //HomePage,
     LoginPage,
+    RegistrationPage,
     PetsPage,
-    VeterianriansPage,
-    
-    
+    HomePage,
+    LoginPage,
+    VeterianriansPage,   
   },
   {
     headerMode: "none",
     defaultNavigationOptions: { headerVisable: false }
   },
   {
-    initialRouteName: "RegistrationPage"
+    initialRouteName: "LoginPage"
   }
 );
 

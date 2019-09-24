@@ -5,7 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Icon from 'react-native-vector-icons/FontAwesome';
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
-
+const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
 export default class Login extends React.Component {
 
@@ -45,48 +45,6 @@ export default class Login extends React.Component {
             }
         });
     }
-    /*
-    btnOpenGallery = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 0.1,
-            base64: true
-        });
-
-        if (!result.canclelled) {
-            this.setState({
-                img: result.uri,
-                base64: result.base64,
-                imgType: result.type
-            });
-        }
-    };
-    showImgUrl = () => {
-        const data = {
-            userID: '1',
-            base64: this.state.base64,
-            imageName: 'Ofir',
-            imageType: this.state.imgType
-        }
-        console.log(data);
-        fetch(URL_DEV + '/SaveImage', {
-            method: 'post',
-            headers: new Headers({
-                'Content-Type': 'application/json;',
-            }),
-            body: JSON.stringify(data)
-        }).then(res => {
-            console.log('res=', res);
-            return res.json()
-        }).then((result) => {
-            let u = JSON.parse(result.d);
-            console.log(u);
-        },
-            (error) => {
-                console.log("err post=", error);
-            });
-    }
-    */
     btnLogin = () => {
         const data = {
             //Most be like the Csharp func Code!
@@ -119,7 +77,8 @@ export default class Login extends React.Component {
                             userRegion: u.RegionCode,
                             userGender: u.Gender,
                             userImage: u.UserImage,
-                            isMember: true
+                            isMember: true,
+                            member:u
                         }, function () { this.saveUser() })
                     }
                     else {
@@ -142,26 +101,17 @@ export default class Login extends React.Component {
             await AsyncStorage.setItem("userRegion", String(this.state.userRegion));
             await AsyncStorage.setItem("userGender", this.state.userGender);
             await AsyncStorage.setItem("userImage", this.state.userImage);
+            await AsyncStorage.setItem("member", JSON.stringify(this.state.member));
             Alert.alert('התחברת בהצלחה');
+            this.navToPetsPage();
             //this.navToHomePage();
         } catch (error) {
             alert(error);
         }
     }
-    btnOpenGallery = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 0.1,
-            base64: true
-        });
-        if (!result.canclelled) {
-            this.setState({ img: result.uri });
-        }
-    };
-    showImgUrl = () => {
-        Alert.alert(this.state.img);
-        console.log(this.state.img);
-    }
+navToPetsPage=()=>{
+      this.props.navigation.navigate("PetsPage");
+}
     txtPass = (e) => {
         this.setState({ userPassword: e });
     }
