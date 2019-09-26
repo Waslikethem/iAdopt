@@ -80,27 +80,29 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
-        //שליפת טבלת המסלולים
-        public static List<Tracks> GetTracksTable()
+        //שליפת טבלת הפעילויות
+        public static List<Activities> GetActivitiesTable()
         {
-            List<Tracks> tracks = new List<Tracks>();
-            Tracks t = null;
-            comm.CommandText = $"SELECT * FROM Tracks";
+            List<Activities> activities = new List<Activities>();
+            Activities a = null;
+            comm.CommandText = $"SELECT * FROM Activities";
             comm.Connection.Open();
             SqlDataReader reader = comm.ExecuteReader();
             while (reader.Read())
             {
-                t = new Tracks()
+                a = new Activities()
                 {
-                    TrackID = int.Parse(reader["TrackID"].ToString()),
-                    TrackName = reader["TrackName"].ToString(),
+                    ActID = int.Parse(reader["ActID"].ToString()),
+                    ActivityName = reader["ActivityName"].ToString(),
                     RegionCode = int.Parse(reader["RegionCode"].ToString()),
                     ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
+                    DueDate = reader["DueDate"].ToString(),
+                    Description = reader["Description"].ToString()
                 };
-                tracks.Add(t);
+                activities.Add(a);
             }
             comm.Connection.Close();
-            return tracks;
+            return activities;
         }
         //שליפת טבלת וטרינרים
         public static List<Veterianrians> GetVeterianriansTable()

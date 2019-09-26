@@ -47,7 +47,7 @@
     <Compile Include="Pets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Regions.cs" />
-    <Compile Include="Tracks.cs" />
+    <Compile Include="Activities.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Veterianrians.cs" />
   </ItemGroup>
