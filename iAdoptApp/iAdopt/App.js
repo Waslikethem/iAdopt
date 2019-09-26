@@ -16,12 +16,12 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
+    PetsPage,
+    VeterianriansPage,   
     LoginPage,
     RegistrationPage,
-    PetsPage,
     HomePage,
-    LoginPage,
-    VeterianriansPage,   
+    
   },
   {
     headerMode: "none",

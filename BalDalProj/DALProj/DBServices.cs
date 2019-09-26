@@ -80,6 +80,28 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
+        //שליפת טבלת המסלולים
+        public static List<Tracks> GetTracksTable()
+        {
+            List<Tracks> tracks = new List<Tracks>();
+            Tracks t = null;
+            comm.CommandText = $"SELECT * FROM Tracks";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                t = new Tracks()
+                {
+                    TrackID = int.Parse(reader["TrackID"].ToString()),
+                    TrackName = reader["TrackName"].ToString(),
+                    RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                    ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
+                };
+                tracks.Add(t);
+            }
+            comm.Connection.Close();
+            return tracks;
+        }
         //שליפת טבלת וטרינרים
         public static List<Veterianrians> GetVeterianriansTable()
         {

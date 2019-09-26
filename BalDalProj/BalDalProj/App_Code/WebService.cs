@@ -27,6 +27,11 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetPetsTable();
     }
     [WebMethod]
+    public string GetTracksTable()
+    {
+        return BALServices.GetTracksTable();
+    }
+    [WebMethod]
     public string GetVeterianriansTable()
     {
         return BALServices.GetVeterianriansTable();

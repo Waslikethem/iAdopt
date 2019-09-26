@@ -1,112 +1,120 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
 import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox } from "react-native-elements";
+import * as ImagePicker from "expo-image-picker";
+import { Icon } from 'react-native-elements'
 import { Col, Row, Grid } from "react-native-easy-grid";
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
-
+const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
 export default class Veterianrians extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectedIndex: 1,
+            //User Interface
+            userPic: IMAGE_URL + 'noPic.png',
+            userName: '',
+            firstName: '',
+            lastName: '',
+            //Misc
+            selectedIndex: 2,
+            //selectedIndex2: 2,
             sortByRace: false,
             sortByGender: false,
             sortByAge: false,
-            pets: [],
             loading: false,
             data: [],
             page: 1,
             error: null,
+            title: 'חפש וטרינר',
+            subTitle: ''
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
+
+    btnOpenGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 0.1,
+            base64: true
+        });
+
+        if (!result.canclelled) {
+            this.setState({
+                img: result.uri,
+                base64: result.base64,
+                imgType: 'jpeg'
+            });
+
+            this.showImgUrl();
+
+        }
+    };
+    showImgUrl = () => {
+        const data = {
+            userID: this.state.member.UserID,
+            base64: this.state.base64,
+            imageName: this.state.member.UserID,
+            imageType: this.state.imgType
+        }
+        console.log(data);
+        fetch(URL + '/SaveImage', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/json;',
+            }),
+            body: JSON.stringify(data)
+        }).then(res => {
+            console.log('res=', res);
+            return res.json()
+        }).then((result) => {
+            let u = JSON.parse(result.d);
+            console.log(u);
+            let m = this.state.member;
+            m.UserImage = u.UserImage;
+            this.setState({
+                userPic: IMAGE_URL + u.UserImage,
+                member: m
+            }, function () {
+                console.log("userPic=" + this.state.userPic);
+            });
+        },
+            (error) => {
+                console.log("err post=", error);
+            });
+    }
+
 
     updateIndex(selectedIndex) {
         this.setState({ selectedIndex })
         Alert.alert(String(selectedIndex));
     }
-    getPetName = () => {
-        Alert.alert('Im inside the func');
-        fetch(URL + "/Test", {
-            method: "post",
-            headers: new Headers({
-                "Content-Type": "application/json;"
-            }),
-            body: JSON.stringify()
-        })
-            .then(res => {
-                console.log("res=", res);
-                return res.json();
-            })
-            .then(
-                result => {
-                    console.log("fetch POST= ", result);
-                    console.log("fetch POST.d= ", result.d);
-                    let p = JSON.parse(result.d);
-                    if (p != null) {
-                        this.setState({ petID: p.PetID });
-                        this.setState({ name: p.Name });
-                        console.log('Pet Name Is :' + this.state.name);
-                    } else {
-                        alert("no such pet!");
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
-    };
-    btnLogin = () => {
-        const data = {
-            userName: 'Nathaniel',
-            userPass: '123'
-        };
-        fetch(URL + "/Login", {
-            method: "post",
-            headers: new Headers({
-                "Content-Type": "application/json;"
-            }),
-            body: JSON.stringify(data)
-        })
-            .then(res => {
-                console.log("res=", res);
-                return res.json();
-            })
-            .then(
-                result => {
-                    console.log("fetch POST= ", result);
-                    console.log("fetch POST.d= ", result.d);
-                    let u = JSON.parse(result.d);
-                    if (u != null) {
-                        this.setState({ n: u.UserName });
-                        this.setState({ n: u.Password });
-                        this.setState({ n: u.UserName });
-                    } else {
-                        alert("no such user!");
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
-    };
+
     showAlert(item) {
         console.log(item);
         Alert.alert(JSON.stringify(item.PetID));
     }
-    myTable() {
-        return this.state.pets;
-    }
+
     chk = () => {
         console.log(this.state.pets);
     }
     componentDidMount() {
-        //this.makeRemoteRequest();
+        AsyncStorage.getItem("member", (err, result) => {
+            console.log("result (member) = " + result);
+            if (result != null) {
+                this.setState({ member: JSON.parse(result) });
+                if (this.state.member.UserImage != null)
+                    this.setState({
+                        userPic: IMAGE_URL + this.state.member.UserImage, userName: this.state.member.UserName,
+                        firstName: this.state.member.Fname, lastName: this.state.member.Lname
+                    }, function () {});
+            }
+        });
+        this.loadVeterianrians();
     }
-    loadPetList = () => {
-        fetch(URL + "/GetPetsDetails", {
+    loadVeterianrians = () => {
+        fetch(URL + "/GetVeterianriansTable", {
             method: "post",
             headers: new Headers({
                 "Content-Type": "application/json;"
@@ -114,18 +122,13 @@ export default class Veterianrians extends React.Component {
             body: JSON.stringify()
         })
             .then(res => {
-                console.log("res=", res);
                 return res.json();
             })
             .then(
                 result => {
-                    console.log("fetch POST= ", result);
-                    console.log("fetch POST.d= ", result.d);
                     let p = JSON.parse(result.d);
-                    console.log('p:===>'+p);
                     if (p != null) {
-                        this.setState({pets:p});
-                        console.log('obj:===> '+this.state.pets);
+                        this.setState({ data: p });
                     } else {
                         alert('error');
                     }
@@ -135,47 +138,103 @@ export default class Veterianrians extends React.Component {
                 }
             );
     }
+    navToVeterianriansPage = () => {
+        this.props.navigation.navigate("VeterianriansPage");
+    }
+    updateIndex2(selectedIndex2) {
+        Alert.alert(String(selectedIndex2));
+        if (selectedIndex2==3) {
+            this.props.navigation.navigate("VeterianriansPage");
+        }
+    }
 
     render() {
+        const component1 = () => <Icon
+            name='building'
+            type='font-awesome'
+            color='#517fa4'
+        />
+        const component2 = () => <Icon
+            name='tags'
+            type='font-awesome'
+            color='#517fa4'
+        />
+        const component3 = () => <Icon
+            name='paw'
+            type='font-awesome'
+            color='#517fa4'
+        />
+        const component4 = () => <Icon
+            name='stethoscope'
+            type='font-awesome'
+            color='#517fa4'
+        />
+        const component5 = () => <Icon
+            name='tree'
+            type='font-awesome'
+            color='#517fa4'
+        />
         const buttons = ['Cats', 'Dogs', 'All']
+        const navigationButtons = [{ element: component1 }, { element: component2 }
+            , { element: component3 }, { element: component4 }, { element: component5 }]
+        const { selectedIndex2 } = this.state
         const { selectedIndex } = this.state
+        v = require('../Images/noPic.png')
         return (
             <View style={styles.container}>
-                <View style={styles.logo}>
-                    <Image Image source={require("../Images/logo.png")} />
+                <View style={styles.header}>
+                    <TouchableOpacity>
+                        <Image
+                            style={styles.profilePic}
+                            source={{ uri: this.state.userPic + '?time' + new Date() }}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.userNameProfileName}>{this.state.firstName + ' ' + this.state.lastName}</Text>
+
                 </View>
-                <ButtonGroup
-                    onPress={this.updateIndex}
-                    selectedIndex={selectedIndex}
-                    buttons={buttons}
-                    containerStyle={{ height: 40, width: 150 }}
-                />
-                <View style={styles.checkBoxContainer}>
-                    <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByRace}
-                        onPress={() => this.setState({ sortByRace: !this.state.sortByRace })} /><Text style={styles.checkBoxText}>גזע</Text>
-                    <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByGender}
-                        onPress={() => this.setState({ sortByGender: !this.state.sortByGender })} /><Text style={styles.checkBoxText}>מין</Text>
-                    <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByAge}
-                        onPress={() => this.setState({ sortByAge: !this.state.sortByAge })} /><Text style={styles.checkBoxText}>גיל</Text>
+                <View style={styles.uppearScreen}>
+                    <Text style={styles.titleCss}>{this.state.title}</Text>
+                    <ButtonGroup
+                        onPress={this.updateIndex}
+                        selectedIndex={selectedIndex}
+                        buttons={buttons}
+                        containerStyle={{ height: 40, width: 150 }}
+                    />
+                    <View style={styles.checkBoxContainer}>
+                        <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByRace}
+                            onPress={() => this.setState({ sortByRace: !this.state.sortByRace })} /><Text style={styles.checkBoxText}>גזע</Text>
+                        <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByGender}
+                            onPress={() => this.setState({ sortByGender: !this.state.sortByGender })} /><Text style={styles.checkBoxText}>מין</Text>
+                        <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByAge}
+                            onPress={() => this.setState({ sortByAge: !this.state.sortByAge })} /><Text style={styles.checkBoxText}>גיל</Text>
+                    </View>
                 </View>
                 <View style={styles.flatListWindow}>
                     <FlatList
-                        data={this.state.pets}
+                        data={this.state.data}
                         extraData={this.state}
                         renderItem={({ item }) => <View style={{ margin: 20 }}>
                             <View style={styles.gridTable}>
-                                <Text onPress={this.showAlert.bind(this, item)}>שם:{item.Name} גיל:{item.Age}{'\n'} גזע:{item.RaceCode}
-                                {'\n'} חיסונים:{item.vaccines}</Text>
+                                <Text onPress={this.showAlert.bind(this, item)}>שם הקליניקה: {item.ClinicName} שם הוטרינר: {item.VeterianrianName}
+                                    {'\n'}יצירת קשר: {item.Phone}</Text>
                             </View>
                         </View>}
                         numColumns={2}
-                        keyExtractor={item => item.PetID}
-                    //keyExtractor={(item, index) => index.toString()}
+                        keyExtractor={item => item.VeterianrianID}
                     />
                 </View>
-                <Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />
-                <Button buttonStyle={{ backgroundColor: 'green', marginTop: 30 }} title='Add Pet' onPress={this.loadPetList} />
-
+                <View style={styles.publishPet}>
+                    <Button buttonStyle={{ backgroundColor: 'green' }} title='העלה תמונה לשרת' onPress={this.btnOpenGallery} />
+                    <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
+                </View>
+                {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}
+                <View style={styles.footer}>
+                    <ButtonGroup
+                        onPress={this.updateIndex2}
+                        selectedIndex={selectedIndex2}
+                        buttons={navigationButtons}
+                        containerStyle={{ height: 45, width: 360, alignSelf: 'center' }} />
+                </View>
             </View>
         );
     }
@@ -188,6 +247,52 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    uppearScreen: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50
+    },
+    header: {
+        flexDirection: 'row',
+        position: 'absolute',
+        marginTop: 24,
+        top: 0,
+        height: 40,
+        width: '100%',
+        //borderBottomWidth: 0.5,
+        //borderBottomColor:'grey'
+    },
+    titleCss: {
+        color: 'blue'
+    },
+    profilePic: {
+        borderRadius: 25,
+        marginTop: 3,
+        marginRight: 3,
+        height: 32,
+        width: 32
+    },
+    userNameProfileName: {
+        marginTop: 12,
+        fontSize: 14,
+        color: 'blue'
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 0,
+        height: 45,
+        width: '100%',
+        // justifyContent:'flex-end',
+    },
+    publishPet: {
+        position: 'absolute',
+        bottom: 50
+    },
+    titleCss: {
+        fontSize: 16,
+        fontFamily: 'sans-serif'
+    },
     logo: {
         marginTop: 20
     },
@@ -196,9 +301,9 @@ const styles = StyleSheet.create({
     },
     gridTable: {
         margin: 5,
-        borderRadius: 4,
-        borderWidth: 2,
-        borderColor: '#ba55d3',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'black',
         width: 130,
         height: 110
     },
@@ -209,7 +314,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'yellow'
     },
     flatListWindow: {
-        height: 350,
+        height: 300,
+        marginBottom: 155
         //marginRight:5
     },
     checkBoxContainer: {

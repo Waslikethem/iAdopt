@@ -7,7 +7,7 @@ import { Col, Row, Grid } from "react-native-easy-grid";
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
 const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
-export default class Pets extends React.Component {
+export default class Tracks extends React.Component {
 
     constructor(props) {
         super(props);
@@ -27,7 +27,7 @@ export default class Pets extends React.Component {
             data: [],
             page: 1,
             error: null,
-            title: 'אמץ בעל חיים',
+            title: 'חפש וטרינר',
             subTitle: ''
         }
         this.updateIndex = this.updateIndex.bind(this)
@@ -111,16 +111,10 @@ export default class Pets extends React.Component {
                     }, function () {});
             }
         });
-        // AsyncStorage.getItem("userPic", (err, result) => {
-        //     console.log("result (userPic) = " + result);
-        //     if (result != null) {
-        //         this.setState({ userPic: JSON.parse(result) });
-        //     }
-        // });
-        this.loadPets();
+        this.loadVeterianrians();
     }
-    loadPets = () => {
-        fetch(URL + "/GetPetsTable", {
+    loadVeterianrians = () => {
+        fetch(URL + "/GetVeterianriansTable", {
             method: "post",
             headers: new Headers({
                 "Content-Type": "application/json;"
@@ -148,7 +142,10 @@ export default class Pets extends React.Component {
         this.props.navigation.navigate("VeterianriansPage");
     }
     updateIndex2(selectedIndex2) {
-     //Not Implemented
+        Alert.alert(String(selectedIndex2));
+        if (selectedIndex2==3) {
+            this.props.navigation.navigate("VeterianriansPage");
+        }
     }
 
     render() {
@@ -171,7 +168,6 @@ export default class Pets extends React.Component {
             name='stethoscope'
             type='font-awesome'
             color='#517fa4'
-            onPress={() =>this.navToVeterianriansPage() }
         />
         const component5 = () => <Icon
             name='tree'
@@ -219,12 +215,12 @@ export default class Pets extends React.Component {
                         extraData={this.state}
                         renderItem={({ item }) => <View style={{ margin: 20 }}>
                             <View style={styles.gridTable}>
-                                <Text onPress={this.showAlert.bind(this, item)}>שם: {item.Name} גיל: {item.Age}{'\n'} גזע: {item.RaceCode}
-                                    {'\n'}חיסונים: {item.Vaccines}</Text>
+                                <Text onPress={this.showAlert.bind(this, item)}>שם הקליניקה: {item.ClinicName} שם הוטרינר: {item.VeterianrianName}
+                                    {'\n'}יצירת קשר: {item.Phone}</Text>
                             </View>
                         </View>}
                         numColumns={2}
-                        keyExtractor={item => item.PetID}
+                        keyExtractor={item => item.VeterianrianID}
                     />
                 </View>
                 <View style={styles.publishPet}>
