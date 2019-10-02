@@ -12,5 +12,6 @@
         public string Vaccines { get; set; }
         public string Image { get; set; }
         public string DueDate { get; set; }
+        public int RegionID { get; set; }
     }
 }

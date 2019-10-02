@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivityType.cs" />
     <Compile Include="DBServices.cs" />
     <Compile Include="Pets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -80,6 +80,73 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
+
+        public static List<Pets> GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
+        {
+            List<Pets> pets = new List<Pets>();
+            Pets p = null;
+            string sql = "Exec GetPetsInfo ";
+            sql += (isDog != -1) ? $"'where IsDog = {isDog} " : "";
+            if (regionId != 0) {
+                sql += (isDog != -1) ? $"and RegionID = {regionId}', " : $"'where RegionID = {regionId}', ";
+            }
+            else {
+                sql += (isDog != -1) ? $"', " : $"NULL, ";
+            }
+
+            sql += (sortByAge) ? "'order by Age" : "";
+
+            if (sortByGender)
+            {
+                sql += (!sortByAge) ? "'order by Gender'" : ", Gender'";
+            }
+            else {
+                sql += (sortByAge) ? "'" : "NULL";
+            }
+            comm.CommandText = sql;
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                p = new Pets()
+                {
+                    PetID = int.Parse(reader["PetID"].ToString()),
+                    Name = reader["Name"].ToString(),
+                    Age = int.Parse(reader["Age"].ToString()),
+                    RaceCode = int.Parse(reader["RaceCode"].ToString()),
+                    IsDog = bool.Parse(reader["IsDog"].ToString()),
+                    UserCode = int.Parse(reader["UserCode"].ToString()),
+                    Gender = char.Parse(reader["Gender"].ToString()),
+                    Vaccines = reader["Vaccines"].ToString(),
+                    Image = reader["Image"].ToString(),
+                    RegionID = int.Parse(reader["RegionID"].ToString())
+                };
+                pets.Add(p);
+            }
+            comm.Connection.Close();
+            return pets;
+        }
+
+        //שליפת טבלת סוג הפעילויות
+        public static List<ActivityTypes> GetActivityTypesTable()
+        {
+            List<ActivityTypes> activity = new List<ActivityTypes>();
+            ActivityTypes a = null;
+            comm.CommandText = $"SELECT * FROM ActivityType";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                a = new ActivityTypes()
+                {
+                    ActivityID = int.Parse(reader["ActivityID"].ToString()),
+                    ActivityType = reader["ActivityType"].ToString(),
+                };
+                activity.Add(a);
+            }
+            comm.Connection.Close();
+            return activity;
+        }
         //שליפת טבלת הפעילויות
         public static List<Activities> GetActivitiesTable()
         {

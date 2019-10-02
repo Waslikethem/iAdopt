@@ -42,6 +42,11 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetRegionsTable();
     }
     [WebMethod]
+    public string GetActivityTypesTable()
+    {
+        return BALServices.GetActivityTypesTable();
+    }
+    [WebMethod]
     public string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
     {
         return BALServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender);
@@ -98,5 +103,11 @@ public class WebService : System.Web.Services.WebService
             return e.Message;
         }
     }
+    [WebMethod]
+    public string GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
+    {
+        return BALServices.GetPetsInfo(isDog, regionId, sortByAge,sortByGender);
+    }
+
 }
 
