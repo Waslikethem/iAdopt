@@ -7,7 +7,7 @@ import { Col, Row, Grid } from "react-native-easy-grid";
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
 const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
-export default class Pets extends React.Component {
+export default class Activities extends React.Component {
 
     constructor(props) {
         super(props);
@@ -25,96 +25,43 @@ export default class Pets extends React.Component {
             sortByAge: false,
             loading: false,
             data: [],
+            buttonsData: [],
             page: 1,
             error: null,
-            title: 'אמץ בעל חיים',
-            subTitle: ''
+            title: 'מצא פעילות',
+            subTitle: '',
+            //FlatViewTable
+
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
-
-    btnOpenGallery = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 0.1,
-            base64: true
-        });
-
-        if (!result.canclelled) {
-            this.setState({
-                img: result.uri,
-                base64: result.base64,
-                imgType: 'jpeg'
-            });
-
-            this.showImgUrl();
-
-        }
-    };
-    showImgUrl = () => {
-        const data = {
-            userID: this.state.member.UserID,
-            base64: this.state.base64,
-            imageName: this.state.member.UserID,
-            imageType: this.state.imgType
-        }
-        console.log(data);
-        fetch(URL + '/SaveImage', {
-            method: 'post',
+    loadActivitesTypes = () => {
+        fetch(URL + "/GetActivitiesTypesTable", {
+            method: "post",
             headers: new Headers({
-                'Content-Type': 'application/json;',
+                "Content-Type": "application/json;"
             }),
-            body: JSON.stringify(data)
-        }).then(res => {
-            console.log('res=', res);
-            return res.json()
-        }).then((result) => {
-            let u = JSON.parse(result.d);
-            console.log(u);
-            let m = this.state.member;
-            m.UserImage = u.UserImage;
-            this.setState({
-                userPic: IMAGE_URL + u.UserImage,
-                member: m
-            }, function () {
-                console.log("userPic=" + this.state.userPic);
-            });
-        },
-            (error) => {
-                console.log("err post=", error);
-            });
+            body: JSON.stringify()
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(
+                result => {
+                    let p = JSON.parse(result.d);
+                    if (p != null) {
+                        this.setState({ buttonsData: p }, function () { console.log(buttonsData) });
+                    } else {
+                        alert('error');
+                    }
+                },
+                error => {
+                    console.log("err post=", error);
+                }
+            );
     }
-
-
-    updateIndex(selectedIndex) {
-        this.setState({ selectedIndex })
-        Alert.alert(String(selectedIndex));
-    }
-
-    showAlert(item) {
-        console.log(item);
-        Alert.alert(JSON.stringify(item.PetID));
-    }
-
-    chk = () => {
-        console.log(this.state.pets);
-    }
-    componentDidMount() {
-        AsyncStorage.getItem("member", (err, result) => {
-            console.log("result (member) = " + result);
-            if (result != null) {
-                this.setState({ member: JSON.parse(result) });
-                if (this.state.member.UserImage != null)
-                    this.setState({
-                        userPic: IMAGE_URL + this.state.member.UserImage, userName: this.state.member.UserName,
-                        firstName: this.state.member.Fname, lastName: this.state.member.Lname
-                    }, function () {});
-            }
-        });
-        this.loadPets();
-    }
-    loadPets = () => {
-        fetch(URL + "/GetPetsTable", { 
+    loadActivities = () => {
+        fetch(URL + "/GetActivitiesTable", {
             method: "post",
             headers: new Headers({
                 "Content-Type": "application/json;"
@@ -138,11 +85,44 @@ export default class Pets extends React.Component {
                 }
             );
     }
+
+    updateIndex(selectedIndex) {
+        this.setState({ selectedIndex })
+        Alert.alert(String(selectedIndex));
+    }
+
+    showAlert(item) {
+        console.log(item);
+        Alert.alert(JSON.stringify(item.PetID));
+    }
+
+    chk = () => {
+        console.log(this.state.pets);
+    }
+    componentDidMount() {
+        AsyncStorage.getItem("member", (err, result) => {
+            console.log("result (member) = " + result);
+            if (result != null) {
+                this.setState({ member: JSON.parse(result) });
+                if (this.state.member.UserImage != null)
+                    this.setState({
+                        userPic: IMAGE_URL + this.state.member.UserImage, userName: this.state.member.UserName,
+                        firstName: this.state.member.Fname, lastName: this.state.member.Lname
+                    }, function () { });
+            }
+        });
+        this.loadActivitesTypes();
+        this.loadActivites();
+    }
+    
     navToVeterianriansPage = () => {
         this.props.navigation.navigate("VeterianriansPage");
     }
     updateIndex2(selectedIndex2) {
-     //Not Implemented
+        Alert.alert(String(selectedIndex2));
+        if (selectedIndex2 == 3) {
+            this.props.navigation.navigate("VeterianriansPage");
+        }
     }
 
     render() {
@@ -165,13 +145,13 @@ export default class Pets extends React.Component {
             name='stethoscope'
             type='font-awesome'
             color='#517fa4'
-            onPress={() =>this.navToVeterianriansPage() }
         />
         const component5 = () => <Icon
             name='tree'
             type='font-awesome'
             color='#517fa4'
         />
+        const newButtons = buttonsData;
         const buttons = ['Cats', 'Dogs', 'All']
         const navigationButtons = [{ element: component1 }, { element: component2 }
             , { element: component3 }, { element: component4 }, { element: component5 }]
@@ -195,7 +175,7 @@ export default class Pets extends React.Component {
                     <ButtonGroup
                         onPress={this.updateIndex}
                         selectedIndex={selectedIndex}
-                        buttons={buttons}
+                        buttons={newButtons.ActivityType}
                         containerStyle={{ height: 40, width: 150 }}
                     />
                     <View style={styles.checkBoxContainer}>
@@ -213,17 +193,15 @@ export default class Pets extends React.Component {
                         extraData={this.state}
                         renderItem={({ item }) => <View style={{ margin: 20 }}>
                             <View style={styles.gridTable}>
-                                <Text onPress={this.showAlert.bind(this, item)}>שם: {item.Name} גיל: {item.Age}{'\n'} גזע: {item.RaceCode}
-                                    {'\n'}חיסונים: {item.Vaccines}</Text>
+                                <Text onPress={this.showAlert.bind(this, item)}>שם: {item.ActivityName}{'\n'}אזור: {item.RegionCode}
+                                    {'\n'}תאור: {item.Description}</Text>
                             </View>
                         </View>}
                         numColumns={2}
-                        keyExtractor={item => item.PetID}
+                        keyExtractor={item => item.ActID}
                     />
                 </View>
                 <View style={styles.publishPet}>
-                    <Button buttonStyle={{ backgroundColor: 'green' }} title='העלה תמונה לשרת' onPress={this.btnOpenGallery} />
-                    <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
                 </View>
                 {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}
                 <View style={styles.footer}>

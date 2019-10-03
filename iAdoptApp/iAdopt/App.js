@@ -6,6 +6,8 @@ import PetsPage from "./Pages/PetsPage";
 import LoginPage from "./Pages/LoginPage";
 import RegistrationPage from "./Pages/RegistrationPage";
 import VeterianriansPage from "./Pages/VeterianriansPage";
+import ActivitiesPage from './Pages/ActivitiesPage';
+import PublishPetPage from './Pages/PublishPetPage';
 
 
 class App extends React.Component {
@@ -16,7 +18,9 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
+    PublishPetPage,
     PetsPage,
+    ActivitiesPage,
     VeterianriansPage,   
     LoginPage,
     RegistrationPage,

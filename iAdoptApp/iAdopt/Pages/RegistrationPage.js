@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
+import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage, Switch } from "react-native";
 import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox, Input, SocialIcon } from "react-native-elements";
 import RNPickerSelect from 'react-native-picker-select';
 import { Col, Row, Grid } from "react-native-easy-grid";
@@ -237,6 +237,7 @@ export default class Registration extends React.Component {
                         onValueChange={(value) => {this.setState({userRegion:value})}}
                         items={this.state.regions}
                     />
+                    {/* <Switch /> */}
 
                     <View style={{ marginTop: 10, alignSelf: 'center' }}>
                         <ButtonGroup
@@ -244,6 +245,7 @@ export default class Registration extends React.Component {
                             selectedIndex={selectedGender}
                             buttons={buttons}
                             containerStyle={{ height: 40, width: 150 }}
+                            selectedButtonStyle = {styles.selectedButtonStyle}
                         />
                     </View>
                 </View>
@@ -316,4 +318,7 @@ const styles = StyleSheet.create({
         marginRight: 0,
         marginTop: 0,
     },
+    selectedButtonStyle:{
+        backgroundColor:'green'
+    }
 });
