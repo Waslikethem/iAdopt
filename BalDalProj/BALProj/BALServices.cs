@@ -28,6 +28,10 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetRegionsTable());
         }
+        public static string GetPetRacesTable(bool isDog)
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.GetPetRacesTable(isDog));
+        }
         public static string GetActivityTypesTable()
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetActivityTypesTable());
@@ -41,6 +45,11 @@ namespace BALProj
         {
             User u = DBServices.SaveUserImage(userID, imgPath);
             return new JavaScriptSerializer().Serialize(u);
+        }
+        public static string SavePetImage(string petID, string imgPath)
+        {
+            Pets p = DBServices.SavePetImage(petID, imgPath);
+            return new JavaScriptSerializer().Serialize(p);
         }
         public static string UpdateUser(string userID, string password, string email, string phone, int regionCode)
         {

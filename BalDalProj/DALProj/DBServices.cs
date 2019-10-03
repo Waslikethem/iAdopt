@@ -80,7 +80,7 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
-
+        //שליפת טבלת חיות המחמד - שי אברהם
         public static List<Pets> GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
         {
             List<Pets> pets = new List<Pets>();
@@ -126,7 +126,48 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
-
+        //שליפת טבלת גזעי החיות מחמד
+        public static List<PetRaces> GetPetRacesTable(bool isDog)
+        {
+            if (isDog)
+            {
+                List<PetRaces> petRaces = new List<PetRaces>();
+                PetRaces pR = null;
+                comm.CommandText = $"SELECT * FROM PetRaces Where isDog=1";
+                comm.Connection.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+                    pR = new PetRaces()
+                    {
+                        value = int.Parse(reader["RaceID"].ToString()),
+                        label = reader["RaceName"].ToString(),
+                    };
+                    petRaces.Add(pR);
+                }
+                comm.Connection.Close();
+                return petRaces;
+            }
+            else
+            {
+                List<PetRaces> petRaces = new List<PetRaces>();
+                PetRaces pR = null;
+                comm.CommandText = $"SELECT * FROM PetRaces Where isDog=0";
+                comm.Connection.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+                    pR = new PetRaces()
+                    {
+                        value = int.Parse(reader["RaceID"].ToString()),
+                        label = reader["RaceName"].ToString(),
+                    };
+                    petRaces.Add(pR);
+                }
+                comm.Connection.Close();
+                return petRaces;
+            }
+        }
         //שליפת טבלת סוג הפעילויות
         public static List<ActivityTypes> GetActivityTypesTable()
         {
@@ -306,7 +347,7 @@ namespace DALProj
             comm.Connection.Close();
             return u;
         }
-        //העלאת תמונה
+        //העלאת תמונת משתמש
         public static User SaveUserImage(string userID, string imgPath)
         {
             User u = null;
@@ -324,6 +365,25 @@ namespace DALProj
             }
             comm.Connection.Close();
             return u;
+        }
+        //העלאת תמונת חיית מחמד
+        public static Pets SavePetImage(string petID, string imgPath)
+        {
+            Pets p = null;
+            comm.CommandText = $"UPDATE PetDetails" +
+                   $" SET Image='{imgPath}' WHERE PetID='{int.Parse(petID)}'";
+            comm.Connection.Open();
+            int res = comm.ExecuteNonQuery();
+            if (res == 1)
+            {
+                p = new Pets()
+                {
+                    PetID = int.Parse(petID),
+                    Image = imgPath
+                };
+            }
+            comm.Connection.Close();
+            return p;
         }
         //עידכון משתמש
         public static User UpdateUser(string userID, string password, string email, string phone, int regionCode)
