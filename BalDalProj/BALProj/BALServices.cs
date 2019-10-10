@@ -16,9 +16,9 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetPetsTable());
         }
-        public static string GetActivitiesTable()
+        public static string GetActivitiesTable(int category)
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetActivitiesTable());
+            return new JavaScriptSerializer().Serialize(DBServices.GetActivitiesTable(category));
         }
         public static string GetVeterianriansTable()
         {

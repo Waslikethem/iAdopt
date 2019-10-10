@@ -27,9 +27,9 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetPetsTable();
     }
     [WebMethod]
-    public string GetActivitiesTable()
+    public string GetActivitiesTable(int category)
     {
-        return BALServices.GetActivitiesTable();
+        return BALServices.GetActivitiesTable(category);
     }
     [WebMethod]
     public string GetVeterianriansTable()
@@ -75,13 +75,14 @@ public class WebService : System.Web.Services.WebService
             return e.Message;
         }
     }
+    //Upload Pet Images 1=1.jpg 2=2.jpg ....
     [WebMethod]
     public string SavePetImage(string petID, string base64, string imageName, string imageType)
     {
         string imgPath;
         try
         {
-            imgPath = StorePetImage(base64, imageName, imageType, "Pets");
+            imgPath = StoreImage(base64, imageName, imageType, $"Pets/{petID}");
             return BALServices.SavePetImage(petID, imgPath);
         }
         catch (Exception e)
@@ -124,36 +125,8 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    public string StorePetImage(string base64, string imgName, string imageType, string folder)
-    {
-        try
-        {
-            String path = HttpContext.Current.Server.MapPath("~/ImageStorage/" + folder); //Path
-
-            //Check if directory exist
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path); //Create directory if it doesn't exist
-            }
-
-            string imageName = imgName + "." + imageType;
-
-            //set the image path
-            string imgPath = Path.Combine(path, imageName);
-
-            byte[] imageBytes = Convert.FromBase64String(base64.Replace(" ", "+"));
-
-            File.WriteAllBytes(imgPath, imageBytes);
-
-            return $"{folder}/{imgName}.{imageType}";
-        }
-        catch (Exception e)
-        {
-            return e.Message;
-        }
-    }
     [WebMethod]
-    public string GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
+    public string GetPetsInfo(int isDog = -1, int regionId = 0, bool sortByAge = false, bool sortByGender = false)
     {
         return BALServices.GetPetsInfo(isDog, regionId, sortByAge,sortByGender);
     }

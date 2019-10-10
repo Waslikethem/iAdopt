@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
+using System.Web;
 using System.Web.Script.Serialization;
 
 namespace DALProj
@@ -87,10 +88,12 @@ namespace DALProj
             Pets p = null;
             string sql = "Exec GetPetsInfo ";
             sql += (isDog != -1) ? $"'where IsDog = {isDog} " : "";
-            if (regionId != 0) {
+            if (regionId != 0)
+            {
                 sql += (isDog != -1) ? $"and RegionID = {regionId}', " : $"'where RegionID = {regionId}', ";
             }
-            else {
+            else
+            {
                 sql += (isDog != -1) ? $"', " : $"NULL, ";
             }
 
@@ -100,10 +103,12 @@ namespace DALProj
             {
                 sql += (!sortByAge) ? "'order by Gender'" : ", Gender'";
             }
-            else {
+            else
+            {
                 sql += (sortByAge) ? "'" : "NULL";
             }
             comm.CommandText = sql;
+            comm.Connection.Close();
             comm.Connection.Open();
             SqlDataReader reader = comm.ExecuteReader();
             while (reader.Read())
@@ -118,11 +123,20 @@ namespace DALProj
                     UserCode = int.Parse(reader["UserCode"].ToString()),
                     Gender = char.Parse(reader["Gender"].ToString()),
                     Vaccines = reader["Vaccines"].ToString(),
-                    Image = reader["Image"].ToString(),
-                    RegionID = int.Parse(reader["RegionID"].ToString())
-                };
+                    RegionID = int.Parse(reader["RegionID"].ToString()),
+                    Gallery = new List<string>()
+            };
                 pets.Add(p);
             }
+            for (int i = 0; i < pets.Count; i++)
+            {
+                string path = HttpContext.Current.Server.MapPath("~/ImageStorage/Pets/" + pets[i].PetID.ToString());
+                string[] files = (Directory.Exists(path)) ? Directory.GetFiles(path) : new string[0];
+                foreach (string file in files) {
+                    pets[i].Gallery.Add(Path.GetFileName(file));
+                }
+            }
+
             comm.Connection.Close();
             return pets;
         }
@@ -189,28 +203,54 @@ namespace DALProj
             return activity;
         }
         //שליפת טבלת הפעילויות
-        public static List<Activities> GetActivitiesTable()
+        public static List<Activities> GetActivitiesTable(int category)
         {
-            List<Activities> activities = new List<Activities>();
-            Activities a = null;
-            comm.CommandText = $"SELECT * FROM Activities";
-            comm.Connection.Open();
-            SqlDataReader reader = comm.ExecuteReader();
-            while (reader.Read())
+            if (category == -1)
             {
-                a = new Activities()
+                List<Activities> activities = new List<Activities>();
+                Activities a = null;
+                comm.CommandText = $"SELECT * FROM Activities";
+                comm.Connection.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
                 {
-                    ActID = int.Parse(reader["ActID"].ToString()),
-                    ActivityName = reader["ActivityName"].ToString(),
-                    RegionCode = int.Parse(reader["RegionCode"].ToString()),
-                    ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
-                    DueDate = reader["DueDate"].ToString(),
-                    Description = reader["Description"].ToString()
-                };
-                activities.Add(a);
+                    a = new Activities()
+                    {
+                        ActID = int.Parse(reader["ActID"].ToString()),
+                        ActivityName = reader["ActivityName"].ToString(),
+                        RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                        ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
+                        DueDate = reader["DueDate"].ToString(),
+                        Description = reader["Description"].ToString()
+                    };
+                    activities.Add(a);
+                }
+                comm.Connection.Close();
+                return activities;
             }
-            comm.Connection.Close();
-            return activities;
+            else
+            {
+                List<Activities> activities = new List<Activities>();
+                Activities a = null;
+                comm.CommandText = $"SELECT * FROM Activities WHERE ActivityCode = {category}";
+                comm.Connection.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+                    a = new Activities()
+                    {
+                        ActID = int.Parse(reader["ActID"].ToString()),
+                        ActivityName = reader["ActivityName"].ToString(),
+                        RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                        ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
+                        DueDate = reader["DueDate"].ToString(),
+                        Description = reader["Description"].ToString()
+                    };
+                    activities.Add(a);
+                }
+                comm.Connection.Close();
+                return activities;
+            }
         }
         //שליפת טבלת וטרינרים
         public static List<Veterianrians> GetVeterianriansTable()

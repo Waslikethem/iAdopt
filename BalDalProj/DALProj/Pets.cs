@@ -1,4 +1,6 @@
-﻿namespace DALProj
+﻿using System.Collections.Generic;
+
+namespace DALProj
 {
     public class Pets
     {
@@ -13,5 +15,6 @@
         public string Image { get; set; }
         public string DueDate { get; set; }
         public int RegionID { get; set; }
+        public List<string> Gallery { get; set; }
     }
 }
