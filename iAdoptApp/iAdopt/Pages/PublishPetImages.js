@@ -10,14 +10,14 @@ const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
 const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
 
 
-export default class Publish extends React.Component {
+export default class PublishImages extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             //Screen
             indexSpacer: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
-            title: 'פרסם חיית מחמד לאימוץ',
+            title: 'פרסם תמונות לחיית מחמד',
             //User
             userID: 0,
             userName: '',
@@ -46,7 +46,7 @@ export default class Publish extends React.Component {
             petVaccines: '',
             petRaces: [],
             petRace: 0,
-            petImage:'null'
+            petImage: 'null'
         }
     }
 
@@ -100,13 +100,11 @@ export default class Publish extends React.Component {
     }
     btnPublishPet = () => {
         //Fetch Pet...
-        if(this.state.petName=='null')
-        {
+        if (this.state.petName == 'null') {
             Alert.alert('Pet Name Cannot Be Empty');
             return;
         }
-        if(this.state.petImage=='null')
-        {
+        if (this.state.petImage == 'null') {
             Alert.alert('Pet Must Have an Image');
             return;
         }
@@ -115,10 +113,10 @@ export default class Publish extends React.Component {
     updateIndex = (selectedKind) => {
         this.setState({ selectedKind });
         if (selectedKind == 0) {
-            this.setState({ isDog: true }, function () { Alert.alert('Dog') })
+            this.setState({ isDog: true }, function () { this.retrievePetRacesTable(true) })
         }
         else {
-            this.setState({ isDog: false }, function () { Alert.alert('Cat') })
+            this.setState({ isDog: false }, function () { this.retrievePetRacesTable(false) })
         }
     }
     btnOpenGallery = async () => {
@@ -180,23 +178,6 @@ export default class Publish extends React.Component {
             this.setState({ petGender: 'f' }, function () { Alert.alert('' + this.state.petGender) })
         }
     }
-    navToPublishPetImages=()=>{
-        this.props.navigation.navigate("PublishPetImages");
-    }
-    savePetDetails = async () => {
-        try {
-            await AsyncStorage.setItem("isMember", JSON.stringify(true));
-            await AsyncStorage.setItem("userPassword", String(this.state.userID));
-            await AsyncStorage.setItem("userName", this.state.userName);
-            await AsyncStorage.setItem("userEmail", this.state.userEmail);
-            await AsyncStorage.setItem("userFirstName", this.state.userFirstName);
-            await AsyncStorage.setItem("userLastName", this.state.userLastName);
-            this.navToPublishPetImages();
-            //this.navToHomePage();
-        } catch (error) {
-            alert(error);
-        }
-    }
     render() {
         const buttons = ['כלב/ה', 'חתול/ה']
         const { selectedKind } = this.state
@@ -246,17 +227,18 @@ export default class Publish extends React.Component {
                     color={"#40c5f4"}
                     //onIncrease={increased => { this.setState({ petAge: increased },function () { Alert.alert('petAge: ' + this.state.petAge) }) }}
                     //onDecrease={decreased => { this.setState({ petAge: decreased },function () { Alert.alert('petAge: ' + this.state.petAge) }) }}
-                    onChange={value => { this.setState({ petAge:value },function () { Alert.alert('petAge: ' + this.state.petAge) }) }}
+                    onChange={value => { this.setState({ petAge: value }, function () { Alert.alert('petAge: ' + this.state.petAge) }) }}
                     value={this.state.petAge}
                 />
 
-                <View style={{width:140}}>
-                <RNPickerSelect
-                    placeholder={{ label: 'גזע', value: null }}
-                    onValueChange={(value) => { this.setState({ petRace: value }, function () { Alert.alert(String(this.state.petRace)) }) }}
-                    items={this.state.petRaces}
-                /></View>
-                <Button buttonStyle={{ backgroundColor: 'orange', marginTop: 30 }} title='עבור לשלב הבא' onPress={this.navToPublishPetImages} />
+                <View style={{ width: 140 }}>
+                    <RNPickerSelect
+                        placeholder={{ label: 'גזע', value: null }}
+                        onValueChange={(value) => { this.setState({ petRace: value }, function () { Alert.alert(String(this.state.petRace)) }) }}
+                        items={this.state.petRaces}
+                    /></View>
+                <Button buttonStyle={{ backgroundColor: 'green' }} title='תמונה' onPress={this.btnOpenGallery} />
+                <Button buttonStyle={{ backgroundColor: 'orange', marginTop: 30 }} title='סיום' onPress={this.btnPublishPet} />
             </View>
         );
     }

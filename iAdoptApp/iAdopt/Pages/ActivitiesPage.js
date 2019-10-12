@@ -26,6 +26,7 @@ export default class Activities extends React.Component {
             loading: false,
             data: [],
             buttonsData: [],
+            newButtons: [],
             page: 1,
             error: null,
             title: 'מצא פעילות',
@@ -35,71 +36,7 @@ export default class Activities extends React.Component {
         }
         this.updateIndex = this.updateIndex.bind(this)
     }
-    loadActivitesTypes = () => {
-        fetch(URL + "/GetActivitiesTypesTable", {
-            method: "post",
-            headers: new Headers({
-                "Content-Type": "application/json;"
-            }),
-            body: JSON.stringify()
-        })
-            .then(res => {
-                return res.json();
-            })
-            .then(
-                result => {
-                    let p = JSON.parse(result.d);
-                    if (p != null) {
-                        this.setState({ buttonsData: p }, function () { console.log(buttonsData) });
-                    } else {
-                        alert('error');
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
-    }
-    loadActivities = () => {
-        fetch(URL + "/GetActivitiesTable", {
-            method: "post",
-            headers: new Headers({
-                "Content-Type": "application/json;"
-            }),
-            body: JSON.stringify()
-        })
-            .then(res => {
-                return res.json();
-            })
-            .then(
-                result => {
-                    let p = JSON.parse(result.d);
-                    if (p != null) {
-                        this.setState({ data: p });
-                    } else {
-                        alert('error');
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
-    }
-
-    updateIndex(selectedIndex) {
-        this.setState({ selectedIndex })
-        Alert.alert(String(selectedIndex));
-    }
-
-    showAlert(item) {
-        console.log(item);
-        Alert.alert(JSON.stringify(item.PetID));
-    }
-
-    chk = () => {
-        console.log(this.state.pets);
-    }
-    componentDidMount() {
+    async componentDidMount() {
         AsyncStorage.getItem("member", (err, result) => {
             console.log("result (member) = " + result);
             if (result != null) {
@@ -111,10 +48,88 @@ export default class Activities extends React.Component {
                     }, function () { });
             }
         });
-        this.loadActivitesTypes();
-        this.loadActivites();
+        await this.loadActivities(-1);
+        await this.loadActivitesTypes();
     }
-    
+
+    loadActivitesTypes = async () => {
+        fetch(URL + "/GetActivityTypesTable", {
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json;"
+            }),
+            body: JSON.stringify()
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(
+                result => {
+                    let p = JSON.parse(result.d);
+                    if (p != null) {
+                        this.setState({ buttonsData: p }, function () { console.log('Activities Types: ' + this.state.buttonsData) });
+                        this.func();
+                    } else {
+                        alert('error');
+                    }
+                },
+                error => {
+                    console.log("err post=", error);
+                }
+            );
+    }
+    loadActivities = async (cat) => {
+        const data={
+            category:cat
+        }
+        fetch(URL + "/GetActivitiesTable", {
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json;"
+            }),
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(
+                result => {
+                    let p = JSON.parse(result.d);
+                    if (p != null) {
+                        this.setState({ data: p }, function () { console.log('Activities: ' + this.state.data) });
+                    } else {
+                        alert('error');
+                    }
+                },
+                error => {
+                    console.log("err post=", error);
+                }
+            );
+    }
+    func = () => {
+        console.log('Func()');
+        for (i = 0; i < this.state.buttonsData.length; i++) {
+            this.state.newButtons.push(this.state.buttonsData[i].ActivityType)
+            console.log('index: ' + i)
+        }
+        console.log('New Array=' + this.state.newButtons);
+
+    }
+    updateIndex(selectedIndex) {
+        this.setState({ selectedIndex })
+        Alert.alert(String(selectedIndex));
+        this.loadActivities(selectedIndex+1);
+    }
+
+    showAlert(item) {
+        console.log(item);
+        Alert.alert(JSON.stringify(item.PetID));
+    }
+
+    chk = () => {
+        console.log(this.state.pets);
+    }
+
     navToVeterianriansPage = () => {
         this.props.navigation.navigate("VeterianriansPage");
     }
@@ -151,8 +166,7 @@ export default class Activities extends React.Component {
             type='font-awesome'
             color='#517fa4'
         />
-        const newButtons = buttonsData;
-        const buttons = ['Cats', 'Dogs', 'All']
+        const newButtons = this.state.newButtons;
         const navigationButtons = [{ element: component1 }, { element: component2 }
             , { element: component3 }, { element: component4 }, { element: component5 }]
         const { selectedIndex2 } = this.state
@@ -175,8 +189,8 @@ export default class Activities extends React.Component {
                     <ButtonGroup
                         onPress={this.updateIndex}
                         selectedIndex={selectedIndex}
-                        buttons={newButtons.ActivityType}
-                        containerStyle={{ height: 40, width: 150 }}
+                        buttons={newButtons}
+                        containerStyle={{ height: 40, width: 250 }}
                     />
                     <View style={styles.checkBoxContainer}>
                         <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByRace}
@@ -187,6 +201,7 @@ export default class Activities extends React.Component {
                             onPress={() => this.setState({ sortByAge: !this.state.sortByAge })} /><Text style={styles.checkBoxText}>גיל</Text>
                     </View>
                 </View>
+
                 <View style={styles.flatListWindow}>
                     <FlatList
                         data={this.state.data}
@@ -201,6 +216,7 @@ export default class Activities extends React.Component {
                         keyExtractor={item => item.ActID}
                     />
                 </View>
+
                 <View style={styles.publishPet}>
                 </View>
                 {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}

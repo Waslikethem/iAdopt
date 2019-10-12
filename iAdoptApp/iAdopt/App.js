@@ -8,6 +8,8 @@ import RegistrationPage from "./Pages/RegistrationPage";
 import VeterianriansPage from "./Pages/VeterianriansPage";
 import ActivitiesPage from './Pages/ActivitiesPage';
 import PublishPetPage from './Pages/PublishPetPage';
+import PublishPetImages from './Pages/PublishPetImages';
+import EditProfilePage from './Pages/EditProfilePage';
 
 
 class App extends React.Component {
@@ -18,7 +20,9 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
-    PublishPetPage,
+    EditProfilePage,
+    //PublishPetPage,
+    //PublishPetImages,
     PetsPage,
     ActivitiesPage,
     VeterianriansPage,   
