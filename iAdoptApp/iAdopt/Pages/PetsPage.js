@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
+import { View, Text, Modal, TouchableHighlight, StyleSheet, Image, ListView, FlatList, Alert, TouchableOpacity, ScrollView, ActivityIndicator, AsyncStorage } from "react-native";
 import { Button, ThemeProvider, ListItem, List, ButtonGroup, CheckBox } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { Icon } from 'react-native-elements';
@@ -32,9 +32,11 @@ export default class Pets extends React.Component {
             error: null,
             title: 'אמץ בעל חיים',
             subTitle: '',
-            regions: []
+            regions: [],
+            modalVisible: false,
+            modalItem: {}
         }
-        this.updateIndex = this.updateIndex.bind(this)
+        //this.updateIndex = this.updateIndex.bind(this)
     }
     componentDidMount() {
         AsyncStorage.getItem("member", (err, result) => {
@@ -48,12 +50,18 @@ export default class Pets extends React.Component {
                     }, function () { });
             }
         });
-        this.loadPage();
+        try {
+            this.loadPage();
+        } catch (error) {
+            console.log("error: ", error);
+        }
 
+    }
+    setModalVisible(visible) {
+        this.setState({ modalVisible: visible });
     }
     loadPage() {
         this.loadPetsInfo(-1, 0, false, false);
-        this.retrieveRegionsTable();
     }
 
     retrieveRegionsTable = () => {
@@ -62,82 +70,33 @@ export default class Pets extends React.Component {
             headers: new Headers({
                 "Content-Type": "application/json;"
             }),
-            body: JSON.stringify()
-        })
-            .then(res => {
-                return res.json();
-            })
-            .then(
-                result => {
-                    let r = JSON.parse(result.d);
-                    //Alert.alert("retrieveRegionsTable:\n"+r);
-                    if (r != null) {
-                        this.setState({ regions: r });
-                    } else {
-                        alert('error');
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
-    }
-    btnOpenGallery = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 0.1,
-            base64: true
-        });
-
-        if (!result.canclelled) {
-            this.setState({
-                img: result.uri,
-                base64: result.base64,
-                imgType: 'jpeg'
-            });
-
-            this.showImgUrl();
-
-        }
-    };
-    showImgUrl = () => {
-        const data = {
-            userID: this.state.member.UserID,
-            base64: this.state.base64,
-            imageName: this.state.member.UserID,
-            imageType: this.state.imgType
-        }
-        console.log(data);
-        fetch(URL + '/SaveImage', {
-            method: 'post',
-            headers: new Headers({
-                'Content-Type': 'application/json;',
-            }),
-            body: JSON.stringify(data)
+            body: ''//JSON.stringify()
         }).then(res => {
-            console.log('res=', res);
-            return res.json()
-        }).then((result) => {
-            let u = JSON.parse(result.d);
-            console.log(u);
-            let m = this.state.member;
-            m.UserImage = u.UserImage;
-            this.setState({
-                userPic: IMAGE_URL + u.UserImage,
-                member: m
-            }, function () {
-                console.log("userPic=" + this.state.userPic);
-            });
-        },
-            (error) => {
-                console.log("err post=", error);
-            });
+            return res.json();
+        }).then(result => {
+            //Alert.alert(JSON.stringify(result));
+            let r = JSON.parse(result.d);
+            //Alert.alert("retrieveRegionsTable:\n"+r);
+            if (r != null) {
+                this.setState({ regions: r });
+
+            } else {
+                alert('error');
+            }
+        }, error => {
+            console.log("err post=", error);
+        }).catch(function (error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+            // ADD THIS THROW error
+            //throw error;
+        });
     }
+
 
 
     updateIndex = (index) => {
         if (this.state.petRegion == null) {
-            //this.setState({ petRegion: 0 });
+            this.setState({ petRegion: 0 });
         }
         this.setState({ selectedIndex: index }, function () {
             this.renderNewTable();
@@ -150,7 +109,7 @@ export default class Pets extends React.Component {
             return;
         }
         else if (this.state.selectedIndex == 2) {
-            this.loadPetsInfo(-1, this.state.petRegion, this.state.sortByAge, this.state.sortByGender);
+            this.loadPetsInfo(0, this.state.petRegion, this.state.sortByAge, this.state.sortByGender);
             return;
         }
         else if (this.state.selectedIndex != 2) {
@@ -175,6 +134,11 @@ export default class Pets extends React.Component {
         Alert.alert(JSON.stringify(item.PetID));
     }
 
+    openModal(item) {
+        this.setState({ modalItem: item });
+        this.setModalVisible(true);
+    }
+
     chk = () => {
         console.log(this.state.pets);
     }
@@ -197,25 +161,24 @@ export default class Pets extends React.Component {
                 "Content-Type": "application/json;"
             }),
             body: JSON.stringify(data)
-        })
-            .then(res => {
-                return res.json();
-            })
-            .then(
-                result => {
-                    let p = JSON.parse(result.d);
-                    Alert.alert("loadPetsInfo:\n"+p);
-                    if (p != null) {
-                        this.setState({ data: p });
-                        console.log('Data: ' + this.state.data)
-                    } else {
-                        alert('error');
-                    }
-                },
-                error => {
-                    console.log("err post=", error);
-                }
-            );
+        }).then(res => {
+            return res.json();
+        }).then(result => {
+            let p = JSON.parse(result.d);
+            if (p != null) {
+                this.setState({ data: p });
+                console.log('Data: ' + this.state.data)
+            } else {
+                alert('error');
+            }
+            this.retrieveRegionsTable();
+        }, error => {
+            console.log("err post=", error);
+        }).catch(function (error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+            // ADD THIS THROW error
+            //throw error;
+        });
     }
 
     updateIndex2(selectedIndex2) {
@@ -259,6 +222,22 @@ export default class Pets extends React.Component {
         //v = require('../Images/noPic.png')
         return (
             <View style={styles.container}>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert('Modal has been closed.');
+                    }}>
+                    <View style={styles.modalScreen}>
+                        <View>
+                            <Text>{this.state.modalItem.Name}</Text>
+                            <Button buttonStyle={{ backgroundColor: 'blue' }} title='סגור' onPress={() => {
+                                this.setModalVisible(!this.state.modalVisible);
+                            }} />
+                        </View>
+                    </View>
+                </Modal>
                 <View style={styles.header}>
                     <TouchableOpacity>
                         <Image
@@ -270,12 +249,11 @@ export default class Pets extends React.Component {
 
                 </View>
                 <View style={styles.uppearScreen}>
-                    <Text style={styles.titleCss}>{this.state.title}</Text>
                     <ButtonGroup
                         onPress={this.updateIndex}
                         selectedIndex={selectedIndex}
                         buttons={buttons}
-                        containerStyle={{ height: 40, width: 150 }}
+                        containerStyle={{ marginTop: 25, height: 40, width: 150 }}
                     />
                     <View style={styles.checkBoxContainer}>
                         <CheckBox style={styles.cb} size={12} checkedIcon='check-square' uncheckedIcon='square' checked={this.state.sortByGender}
@@ -297,9 +275,12 @@ export default class Pets extends React.Component {
                         extraData={this.state}
                         renderItem={({ item }) => <View style={{ margin: 20, marginBottom: 40 }}>
                             <View style={styles.gridTable}>
-                                <TouchableOpacity onPress={this.showAlert.bind(this, item)}>
+                                <TouchableHighlight
+                                    onPress={() => {
+                                        this.openModal(item);
+                                    }}>
                                     <Image style={{ width: 129, height: 109, borderRadius: 5 }} source={{ uri: IMAGE_URL + "Pets/" + item.PetID + "/1.jpg" }} />
-                                </TouchableOpacity>
+                                </TouchableHighlight>
                                 <Text>שם: {item.Name} גיל: {item.Age}{'\n'} גזע: {item.RaceCode}
                                     {'\n'}חיסונים: {item.Vaccines}</Text>
                             </View>
@@ -312,7 +293,6 @@ export default class Pets extends React.Component {
 
                 </View>
                 <View style={styles.publishPet}>
-                    <Button buttonStyle={{ backgroundColor: 'green' }} title='העלה תמונה לשרת' onPress={this.btnOpenGallery} />
                     <Button buttonStyle={{ backgroundColor: 'orange' }} title='פרסם בעל חיים לאימוץ' onPress={this.loadPets} />
                 </View>
                 {/*<Button buttonStyle={{ backgroundColor: 'red', marginTop: 30 }} title='CHECK' onPress={this.chk} />*/}
@@ -340,6 +320,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 50
+    },
+    modalScreen: {
+        flex: 0.82,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 350,
+        margin: 5,
+        marginTop: 90
+
     },
     header: {
         flexDirection: 'row',
@@ -389,9 +378,9 @@ const styles = StyleSheet.create({
     },
     gridTable: {
         margin: 5,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'black',
+        //borderRadius: 5,
+        //borderWidth: 1,
+        //borderColor: 'black',
         width: 130,
         height: 110
     },

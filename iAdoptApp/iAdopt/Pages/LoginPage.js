@@ -133,7 +133,6 @@ navToPetsPage=()=>{
                 <View style={styles.logo}>
                     <Image Image source={require("../Images/logo.png")} />
                 </View>
-                <Text style={styles.titleCss}>{this.state.title}</Text>
                 <KeyboardAvoidingView style={styles.container} behavior="padding">
                     <View style={{ width: 225 }}>
                         <Input

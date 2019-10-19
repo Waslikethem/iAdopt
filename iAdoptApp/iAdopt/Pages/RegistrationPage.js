@@ -186,7 +186,6 @@ export default class Registration extends React.Component {
                 <View style={styles.logo}>
                     <Image Image source={require("../Images/logo.png")} />
                 </View>
-                <Text style={styles.titleCss}>{this.state.title}</Text>
                 <View style={{ width: 225 }}>
                     <Input
                         onChangeText={this.txtUserName}
@@ -319,6 +318,6 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     selectedButtonStyle:{
-        backgroundColor:'green'
+        backgroundColor:'blue'
     }
 });

@@ -145,6 +145,57 @@ export default class EditProfile extends React.Component {
             Alert.alert('הסיסמאות אינם תואמות');
         }
     }
+    btnOpenGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 0.1,
+            base64: true
+        });
+
+        if (!result.canclelled) {
+            this.setState({
+                img: result.uri,
+                base64: result.base64,
+                imgType: 'jpeg'
+            });
+
+            this.showImgUrl();
+
+        }
+    };
+    showImgUrl = () => {
+        const data = {
+            userID: this.state.member.UserID,
+            base64: this.state.base64,
+            imageName: this.state.member.UserID,
+            imageType: this.state.imgType
+        }
+        console.log(data);
+        fetch(URL + '/SaveImage', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/json;',
+            }),
+            body: JSON.stringify(data)
+        }).then(res => {
+            console.log('res=', res);
+            return res.json()
+        }).then((result) => {
+            let u = JSON.parse(result.d);
+            console.log(u);
+            let m = this.state.member;
+            m.UserImage = u.UserImage;
+            this.setState({
+                userPic: IMAGE_URL + u.UserImage,
+                member: m
+            }, function () {
+                console.log("userPic=" + this.state.userPic);
+            });
+        },
+            (error) => {
+                console.log("err post=", error);
+            });
+    }
     render() {
         const component1 = () => <Icon
             name='building'
@@ -227,6 +278,7 @@ export default class EditProfile extends React.Component {
                     </View>
                 </View>
                 <View style={styles.publishPet}>
+                <Button buttonStyle={{ backgroundColor: 'green' }} title='עדכן תמונת משתמש' onPress={this.btnOpenGallery} />
                     <Button buttonStyle={{ backgroundColor: 'orange' }} title='עדכן משתמש' onPress={this.updateUser} />
                 </View>
                 <View style={styles.footer}>

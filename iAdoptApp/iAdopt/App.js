@@ -20,12 +20,12 @@ class App extends React.Component {
 
 const AppNavigator = createStackNavigator(
   {
-    EditProfilePage,
+    //EditProfilePage,
     //PublishPetPage,
     //PublishPetImages,
     PetsPage,
-    ActivitiesPage,
-    VeterianriansPage,   
+    //ActivitiesPage,
+    //VeterianriansPage,   
     LoginPage,
     RegistrationPage,
     HomePage,
