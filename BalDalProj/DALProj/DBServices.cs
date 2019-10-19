@@ -140,6 +140,22 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
+        public static string GetPetPhoneNumber(string userID)
+        {
+            User u = null;
+            comm.CommandText = $"SELECT Phone FROM Users Where (UserID='{userID}')";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            if (reader.Read())
+            {
+                u = new User()
+                {
+                    Phone = reader["Phone"].ToString(),
+                };
+            }
+            comm.Connection.Close();
+            return u.Phone;
+        }
         //שליפת טבלת גזעי החיות מחמד
         public static List<PetRaces> GetPetRacesTable(bool isDog)
         {

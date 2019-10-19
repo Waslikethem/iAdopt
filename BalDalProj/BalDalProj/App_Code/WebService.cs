@@ -130,6 +130,10 @@ public class WebService : System.Web.Services.WebService
     {
         return BALServices.GetPetsInfo(isDog, regionId, sortByAge,sortByGender);
     }
-
+    [WebMethod]
+    public string GetPetPhoneNumber(string userID)
+    {
+        return BALServices.GetPetPhoneNumber(userID);
+    }
 }
 
