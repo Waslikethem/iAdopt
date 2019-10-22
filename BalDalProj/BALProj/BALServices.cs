@@ -55,7 +55,11 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.UpdateUser(userID, password, email, phone, regionCode));
         }
-
+        public static string GetPetInfo(int petID)
+        {
+            Pets p = DBServices.GetPetInfo(petID);
+            return new JavaScriptSerializer().Serialize(p);
+        }
         public static string GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetPetsInfo(isDog, regionId, sortByAge, sortByGender));

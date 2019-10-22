@@ -10,5 +10,6 @@
 10) npm install react-native-picker-select
 11) npm install react-native-easy-grid --save
 12) npm install react-native-input-spinner --save
-13) expo install expo-image-picker 
+13) npm install --save react-native-snap-carousel
 14) yarn add react-native-material-ui
+15) expo install expo-image-picker 

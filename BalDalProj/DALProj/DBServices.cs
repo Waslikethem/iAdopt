@@ -140,6 +140,31 @@ namespace DALProj
             comm.Connection.Close();
             return pets;
         }
+        //שליפת נתוני חיה מהטבלה
+        public static Pets GetPetInfo(int petID)
+        {
+            Pets p = null;
+            comm.CommandText = $"SELECT * FROM PetDetails WHERE PetID='{petID}'";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            if (reader.Read())
+            {
+                p = new Pets()
+                {
+                    PetID = int.Parse(reader["PetID"].ToString()),
+                    Name = reader["Name"].ToString(),
+                    Age = int.Parse(reader["Age"].ToString()),
+                    RaceCode = int.Parse(reader["RaceCode"].ToString()),
+                    IsDog = bool.Parse(reader["IsDog"].ToString()),
+                    UserCode = int.Parse(reader["UserCode"].ToString()),
+                    Gender = char.Parse(reader["Gender"].ToString()),
+                    Vaccines = reader["Vaccines"].ToString(),
+                    Gallery = new List<string>()
+                };
+            }
+            comm.Connection.Close();
+            return p;
+        }
         public static string GetPetPhoneNumber(string userID)
         {
             User u = null;
