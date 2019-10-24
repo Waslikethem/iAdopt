@@ -20,9 +20,9 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetActivitiesTable(category));
         }
-        public static string GetVeterianriansTable()
+        public static string GetCategoryTable(int CatID)
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetVeterianriansTable());
+            return new JavaScriptSerializer().Serialize(DBServices.GetCategoryTable(CatID));
         }
         public static string GetRegionsTable()
         {
@@ -55,9 +55,9 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.UpdateUser(userID, password, email, phone, regionCode));
         }
-        public static string GetPetInfo(int petID)
+        public static string GetPetGallery(int petID)
         {
-            Pets p = DBServices.GetPetInfo(petID);
+            Pets p = DBServices.GetPetGallery(petID);
             return new JavaScriptSerializer().Serialize(p);
         }
         public static string GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)

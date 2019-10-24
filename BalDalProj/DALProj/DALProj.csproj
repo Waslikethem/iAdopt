@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityType.cs" />
+    <Compile Include="Categories.cs" />
     <Compile Include="DBServices.cs" />
     <Compile Include="PetRaces.cs" />
     <Compile Include="Pets.cs" />

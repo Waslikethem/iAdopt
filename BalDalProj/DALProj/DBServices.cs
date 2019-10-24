@@ -125,14 +125,15 @@ namespace DALProj
                     Vaccines = reader["Vaccines"].ToString(),
                     RegionID = int.Parse(reader["RegionID"].ToString()),
                     Gallery = new List<string>()
-            };
+                };
                 pets.Add(p);
             }
             for (int i = 0; i < pets.Count; i++)
             {
                 string path = HttpContext.Current.Server.MapPath("~/ImageStorage/Pets/" + pets[i].PetID.ToString());
                 string[] files = (Directory.Exists(path)) ? Directory.GetFiles(path) : new string[0];
-                foreach (string file in files) {
+                foreach (string file in files)
+                {
                     pets[i].Gallery.Add(Path.GetFileName(file));
                 }
             }
@@ -141,7 +142,7 @@ namespace DALProj
             return pets;
         }
         //שליפת נתוני חיה מהטבלה
-        public static Pets GetPetInfo(int petID)
+        public static Pets GetPetGallery(int petID)
         {
             Pets p = null;
             comm.CommandText = $"SELECT * FROM PetDetails WHERE PetID='{petID}'";
@@ -162,9 +163,16 @@ namespace DALProj
                     Gallery = new List<string>()
                 };
             }
+            string path = HttpContext.Current.Server.MapPath("~/ImageStorage/Pets/" + p.PetID.ToString());
+            string[] files = (Directory.Exists(path)) ? Directory.GetFiles(path) : new string[0];
+            foreach (string file in files)
+            {
+                p.Gallery.Add(Path.GetFileName(file));
+            }
             comm.Connection.Close();
             return p;
         }
+        //שליפת מס הפלאפון של בעל החיה
         public static string GetPetPhoneNumber(string userID)
         {
             User u = null;
@@ -257,8 +265,8 @@ namespace DALProj
                 {
                     a = new Activities()
                     {
-                        ActID = int.Parse(reader["ActID"].ToString()),
-                        ActivityName = reader["ActivityName"].ToString(),
+                        ID = int.Parse(reader["ID"].ToString()),
+                        Name = reader["Name"].ToString(),
                         RegionCode = int.Parse(reader["RegionCode"].ToString()),
                         ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
                         DueDate = reader["DueDate"].ToString(),
@@ -280,8 +288,8 @@ namespace DALProj
                 {
                     a = new Activities()
                     {
-                        ActID = int.Parse(reader["ActID"].ToString()),
-                        ActivityName = reader["ActivityName"].ToString(),
+                        ID = int.Parse(reader["ID"].ToString()),
+                        Name = reader["Name"].ToString(),
                         RegionCode = int.Parse(reader["RegionCode"].ToString()),
                         ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
                         DueDate = reader["DueDate"].ToString(),
@@ -293,29 +301,56 @@ namespace DALProj
                 return activities;
             }
         }
-        //שליפת טבלת וטרינרים
-        public static List<Veterianrians> GetVeterianriansTable()
+        //שליפת ערכים ספציפים מטבלת קטגוריות לפי מס קטגוריה
+        public static List<Categories> GetCategoryTable(int CatID)
         {
-            List<Veterianrians> vets = new List<Veterianrians>();
-            Veterianrians v = null;
-            comm.CommandText = $"SELECT * FROM Veterianrians";
+            List<Categories> cats = new List<Categories>();
+            Categories c = null;
+            switch (CatID)
+            {
+                case 1:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=1";
+                    break;
+                case 2:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=2";
+                    break;
+                case 3:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=3";
+                    break;
+                case 4:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=4";
+                    break;
+                case 5:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=5";
+                    break;
+                case 6:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=6";
+                    break;
+                case 7:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=7";
+                    break;
+                case 8:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=8";
+                    break;
+            }
             comm.Connection.Open();
             SqlDataReader reader = comm.ExecuteReader();
             while (reader.Read())
             {
-                v = new Veterianrians()
+                c = new Categories()
                 {
-                    VeterianrianID = int.Parse(reader["VeterianrianID"].ToString()),
-                    ClinicName = reader["ClinicName"].ToString(),
+                    ID = int.Parse(reader["ID"].ToString()),
+                    Name = reader["Name"].ToString(),
                     RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                    CategoryCode = int.Parse(reader["CategoryCode"].ToString()),
+                    Description = reader["Description"].ToString(),
+                    Phone = reader["Phone"].ToString(),
                     Address = reader["Address"].ToString(),
-                    VeterianrianName = reader["VeterianrianName"].ToString(),
-                    Phone = reader["Phone"].ToString()
                 };
-                vets.Add(v);
+                cats.Add(c);
             }
             comm.Connection.Close();
-            return vets;
+            return cats;
         }
         //שליפת טבלת האזורים בארץ
         public static List<Regions> GetRegionsTable()

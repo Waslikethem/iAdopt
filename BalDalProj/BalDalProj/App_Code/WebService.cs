@@ -32,9 +32,9 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetActivitiesTable(category);
     }
     [WebMethod]
-    public string GetVeterianriansTable()
+    public string GetCategoryTable(int CatID)
     {
-        return BALServices.GetVeterianriansTable();
+        return BALServices.GetCategoryTable(CatID);
     }
     [WebMethod]
     public string GetRegionsTable()
@@ -131,9 +131,9 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetPetsInfo(isDog, regionId, sortByAge,sortByGender);
     }
     [WebMethod]
-    public string GetPetInfo(int petID)
+    public string GetPetGallery(int petID)
     {
-        return BALServices.GetPetInfo(petID);
+        return BALServices.GetPetGallery(petID);
     }
 
 
