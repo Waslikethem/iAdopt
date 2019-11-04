@@ -22,11 +22,6 @@ public class WebService : System.Web.Services.WebService
         //InitializeComponent(); 
     }
     [WebMethod]
-    public string GetPetsTable()
-    {
-        return BALServices.GetPetsTable();
-    }
-    [WebMethod]
     public string GetActivitiesTable(int category)
     {
         return BALServices.GetActivitiesTable(category);
@@ -77,13 +72,13 @@ public class WebService : System.Web.Services.WebService
     }
     //Upload Pet Images 1=1.jpg 2=2.jpg ....
     [WebMethod]
-    public string SavePetImage(string petID, string base64, string imageName, string imageType)
+    public string SavePetImage(string petID, string base64, string imageName, string imageType,int imgNum)
     {
         string imgPath;
         try
         {
-            imgPath = StoreImage(base64, imageName, imageType, $"Pets/{petID}");
-            return BALServices.SavePetImage(petID, imgPath);
+            imgPath = StoreImage(base64, imageName, imageType, $"Pets/{petID}/{imgNum}");
+            return BALServices.SavePetImage2(petID, imgPath);
         }
         catch (Exception e)
         {
@@ -131,17 +126,29 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetPetsInfo(isDog, regionId, sortByAge,sortByGender);
     }
     [WebMethod]
-    public string GetPetGallery(int petID)
+    public string GetPetDetails(int petID)
     {
-        return BALServices.GetPetGallery(petID);
+        return BALServices.GetPetDetails(petID);
     }
-
-
-
     [WebMethod]
-    public string GetPetPhoneNumber(string userID)
+    public string  GetCategoriesTypes()
     {
-        return BALServices.GetPetPhoneNumber(userID);
+        return BALServices.GetCategoriesTypes();
+    }
+    [WebMethod]
+    public string GetOwnerPhoneNumber(string userID)
+    {
+        return BALServices.GetOwnerPhoneNumber(userID);
+    }
+    [WebMethod]
+    public string GetPetRace(int raceCode)
+    {
+        return BALServices.GetPetRace(raceCode);
+    }
+    [WebMethod]
+    public string GetCategoryDetails(int key)
+    {
+        return BALServices.GetCategoryDetails(key);
     }
 }
 

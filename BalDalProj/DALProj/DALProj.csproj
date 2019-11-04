@@ -46,10 +46,12 @@
   <ItemGroup>
     <Compile Include="ActivityType.cs" />
     <Compile Include="Categories.cs" />
+    <Compile Include="CategoryTypes.cs" />
     <Compile Include="DBServices.cs" />
     <Compile Include="PetRaces.cs" />
     <Compile Include="Pets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Races.cs" />
     <Compile Include="Regions.cs" />
     <Compile Include="Activities.cs" />
     <Compile Include="User.cs" />

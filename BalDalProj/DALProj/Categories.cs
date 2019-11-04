@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace DALProj
 {
     public class Categories
@@ -10,5 +12,6 @@ namespace DALProj
         public string Description { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
+        public List<string> Gallery { get; set; }
     }
 }

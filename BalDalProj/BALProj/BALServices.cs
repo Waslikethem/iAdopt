@@ -12,10 +12,6 @@ namespace BALProj
             User u = DBServices.Login(userNameOrEmail, userPass);
             return new JavaScriptSerializer().Serialize(u);
         }
-        public static string GetPetsTable()
-        {
-            return new JavaScriptSerializer().Serialize(DBServices.GetPetsTable());
-        }
         public static string GetActivitiesTable(int category)
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetActivitiesTable(category));
@@ -46,7 +42,7 @@ namespace BALProj
             User u = DBServices.SaveUserImage(userID, imgPath);
             return new JavaScriptSerializer().Serialize(u);
         }
-        public static string SavePetImage(string petID, string imgPath)
+        public static string SavePetImage2(string petID, string imgPath)
         {
             Pets p = DBServices.SavePetImage(petID, imgPath);
             return new JavaScriptSerializer().Serialize(p);
@@ -55,18 +51,30 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.UpdateUser(userID, password, email, phone, regionCode));
         }
-        public static string GetPetGallery(int petID)
+        public static string GetPetDetails(int petID)
         {
-            Pets p = DBServices.GetPetGallery(petID);
+            Pets p = DBServices.GetPetDetails(petID);
             return new JavaScriptSerializer().Serialize(p);
         }
         public static string GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetPetsInfo(isDog, regionId, sortByAge, sortByGender));
         }
-        public static string GetPetPhoneNumber(string userID)
+        public static string GetOwnerPhoneNumber(string userID)
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetPetPhoneNumber(userID));
+            return new JavaScriptSerializer().Serialize(DBServices.GetOwnerPhoneNumber(userID));
+        }
+        public static string GetCategoriesTypes()
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.GetCategoriesTypes());
+        }
+        public static string GetPetRace(int raceCode)
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.GetPetRace(raceCode));
+        }
+        public static string GetCategoryDetails(int key)
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.GetCategoryDetails(key));
         }
     }
 }

@@ -54,33 +54,6 @@ namespace DALProj
             }
             return string.Empty;
         }
-        //שליפת טבלת חיות המחמד
-        public static List<Pets> GetPetsTable()
-        {
-            List<Pets> pets = new List<Pets>();
-            Pets p = null;
-            comm.CommandText = $"SELECT * FROM PetDetails where DueDate > getdate()";
-            comm.Connection.Open();
-            SqlDataReader reader = comm.ExecuteReader();
-            while (reader.Read())
-            {
-                p = new Pets()
-                {
-                    PetID = int.Parse(reader["PetID"].ToString()),
-                    Name = reader["Name"].ToString(),
-                    Age = int.Parse(reader["Age"].ToString()),
-                    RaceCode = int.Parse(reader["RaceCode"].ToString()),
-                    IsDog = bool.Parse(reader["IsDog"].ToString()),
-                    UserCode = int.Parse(reader["UserCode"].ToString()),
-                    Gender = char.Parse(reader["Gender"].ToString()),
-                    Vaccines = reader["Vaccines"].ToString(),
-                    Image = reader["Image"].ToString()
-                };
-                pets.Add(p);
-            }
-            comm.Connection.Close();
-            return pets;
-        }
         //שליפת טבלת חיות המחמד - שי אברהם
         public static List<Pets> GetPetsInfo(int isDog, int regionId, bool sortByAge, bool sortByGender)
         {
@@ -142,7 +115,7 @@ namespace DALProj
             return pets;
         }
         //שליפת נתוני חיה מהטבלה
-        public static Pets GetPetGallery(int petID)
+        public static Pets GetPetDetails(int petID)
         {
             Pets p = null;
             comm.CommandText = $"SELECT * FROM PetDetails WHERE PetID='{petID}'";
@@ -172,8 +145,25 @@ namespace DALProj
             comm.Connection.Close();
             return p;
         }
+        //שליפת שם אזור לפי מפתח
+        public static string GetPetRace(int raceCode)
+        {
+            Races r = null;
+            comm.CommandText = $"SELECT * FROM PetRaces Where (RaceID='{raceCode}')";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            if (reader.Read())
+            {
+                r = new Races()
+                {
+                    RaceName = reader["RaceName"].ToString(),
+                };
+            }
+            comm.Connection.Close();
+            return r.RaceName;
+        }
         //שליפת מס הפלאפון של בעל החיה
-        public static string GetPetPhoneNumber(string userID)
+        public static string GetOwnerPhoneNumber(string userID)
         {
             User u = null;
             comm.CommandText = $"SELECT Phone FROM Users Where (UserID='{userID}')";
@@ -524,6 +514,56 @@ namespace DALProj
             comm.Connection.Close();
             return u;
 
+        }
+        public static List<CategoryTypes> GetCategoriesTypes()
+        {
+            List<CategoryTypes> categories = new List<CategoryTypes>();
+            CategoryTypes category = null;
+            comm.CommandText = $"SELECT * FROM CategoryType";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                category = new CategoryTypes()
+                {
+                    MiscID = int.Parse(reader["MiscID"].ToString()),
+                    MiscName = reader["MiscName"].ToString(),
+                    CategoryImage = "Category/" + int.Parse(reader["MiscID"].ToString()) + "/1.jpg"
+                };
+                categories.Add(category);
+            }
+            comm.Connection.Close();
+            return categories;
+        }
+        //שליפת פרטי קטגוריה
+        public static Categories GetCategoryDetails(int key)
+        {
+            Categories c = null;
+            comm.CommandText = $"SELECT * FROM Categories Where (ID='{key}')";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            if (reader.Read())
+            {
+                c = new Categories()
+                {
+                    Name = reader["Name"].ToString(),
+                    Description = reader["Description"].ToString(),
+                    Phone = reader["Phone"].ToString(),
+                    Address = reader["Address"].ToString(),
+                    CategoryCode = int.Parse(reader["CategoryCode"].ToString()),
+                    Gallery = new List<string>(),
+                    ID = int.Parse(reader["ID"].ToString()),
+                    RegionCode = int.Parse(reader["RegionCode"].ToString())
+                };
+            }
+            string path = HttpContext.Current.Server.MapPath("~/ImageStorage/Category/" + c.CategoryCode + @"/" + key.ToString());
+            string[] files = (Directory.Exists(path)) ? Directory.GetFiles(path) : new string[0];
+            foreach (string file in files)
+            {
+                c.Gallery.Add(Path.GetFileName(file));
+            }
+            comm.Connection.Close();
+            return c;
         }
     }
 }
