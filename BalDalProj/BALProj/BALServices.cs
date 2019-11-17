@@ -7,18 +7,23 @@ namespace BALProj
 {
     public static class BALServices
     {
-        public static string Login(string userNameOrEmail, string userPass)
+        public static string DeletePet(int pet_id)
         {
-            User u = DBServices.Login(userNameOrEmail, userPass);
-            return new JavaScriptSerializer().Serialize(u);
-        }
-        public static string GetActivitiesTable(int category)
-        {
-            return new JavaScriptSerializer().Serialize(DBServices.GetActivitiesTable(category));
+            return new JavaScriptSerializer().Serialize(DBServices.DeletePet(pet_id));
+
         }
         public static string GetCategoryTable(int CatID)
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetCategoryTable(CatID));
+        }
+        public static string ShowMyPets(int user_id)
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.ShowMyPets(user_id));
+        }
+        public static string Login(string userNameOrEmail, string userPass)
+        {
+            User u = DBServices.Login(userNameOrEmail, userPass);
+            return new JavaScriptSerializer().Serialize(u);
         }
         public static string GetRegionsTable()
         {
@@ -28,13 +33,9 @@ namespace BALProj
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetPetRacesTable(isDog));
         }
-        public static string GetActivityTypesTable()
+        public static string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender, string userImage = "")
         {
-            return new JavaScriptSerializer().Serialize(DBServices.GetActivityTypesTable());
-        }
-        public static string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
-        {
-            User u = DBServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender);
+            User u = DBServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender, userImage);
             return new JavaScriptSerializer().Serialize(u);
         }
         public static string SaveUserImage(string userID, string imgPath)
@@ -75,6 +76,10 @@ namespace BALProj
         public static string GetCategoryDetails(int key)
         {
             return new JavaScriptSerializer().Serialize(DBServices.GetCategoryDetails(key));
+        }
+        public static string PetRegistration(string name, int age, int raceCode, bool isDog, int userCode, char gender, string vaccines, string img = "")
+        {
+            return new JavaScriptSerializer().Serialize(DBServices.PetRegistration(name,age,raceCode,isDog,userCode,gender,vaccines,img));
         }
     }
 }

@@ -14,6 +14,7 @@ namespace DALProj
 {
     public static class DBServices
     {
+        //We have 11 Fetch Calls in React Native
         static string conStr = null;
         static bool local = true;
         static SqlConnection conn = null;
@@ -40,6 +41,86 @@ namespace DALProj
             conn = new SqlConnection(conStr);
             comm = new SqlCommand();
             comm.Connection = conn;
+        }
+        //מחיקת חיית מחמד ספציפית
+        public static string DeletePet(int pet_id)
+        {
+            comm.CommandText = $"DELETE FROM PetDetails WHERE PetID='{pet_id}'";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            comm.Connection.Close();
+            return null;
+        }
+        //הצגת כל החיות מחמד של המשתמש
+        public static List<Pets> ShowMyPets(int user_id)
+        {
+            List<Pets> pets = new List<Pets>();
+            Pets p = null;
+            comm.CommandText = $"SELECT * FROM PetDetails WHERE UserCode='{user_id}'";
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                p = new Pets()
+                {
+                    PetID = int.Parse(reader["PetID"].ToString()),
+                    Name = reader["Name"].ToString(),
+                };
+                pets.Add(p);
+            }
+            comm.Connection.Close();
+            return pets;
+        }
+        //שליפת ערכים ספציפים מטבלת קטגוריות לפי מס קטגוריה
+        public static List<Categories> GetCategoryTable(int CatID)
+        {
+            List<Categories> cats = new List<Categories>();
+            Categories c = null;
+            switch (CatID)
+            {
+                case 1:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=1";
+                    break;
+                case 2:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=2";
+                    break;
+                case 3:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=3";
+                    break;
+                case 4:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=4";
+                    break;
+                case 5:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=5";
+                    break;
+                case 6:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=6";
+                    break;
+                case 7:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=7";
+                    break;
+                case 8:
+                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=8";
+                    break;
+            }
+            comm.Connection.Open();
+            SqlDataReader reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+                c = new Categories()
+                {
+                    ID = int.Parse(reader["ID"].ToString()),
+                    Name = reader["Name"].ToString(),
+                    RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                    CategoryCode = int.Parse(reader["CategoryCode"].ToString()),
+                    Description = reader["Description"].ToString(),
+                    Phone = reader["Phone"].ToString(),
+                    Address = reader["Address"].ToString(),
+                };
+                cats.Add(c);
+            }
+            comm.Connection.Close();
+            return cats;
         }
         static string GetAppSetting(Configuration config, string key)
         {
@@ -221,127 +302,6 @@ namespace DALProj
                 return petRaces;
             }
         }
-        //שליפת טבלת סוג הפעילויות
-        public static List<ActivityTypes> GetActivityTypesTable()
-        {
-            List<ActivityTypes> activity = new List<ActivityTypes>();
-            ActivityTypes a = null;
-            comm.CommandText = $"SELECT * FROM ActivityType";
-            comm.Connection.Open();
-            SqlDataReader reader = comm.ExecuteReader();
-            while (reader.Read())
-            {
-                a = new ActivityTypes()
-                {
-                    ActivityID = int.Parse(reader["ActivityID"].ToString()),
-                    ActivityType = reader["ActivityType"].ToString(),
-                };
-                activity.Add(a);
-            }
-            comm.Connection.Close();
-            return activity;
-        }
-        //שליפת טבלת הפעילויות
-        public static List<Activities> GetActivitiesTable(int category)
-        {
-            if (category == -1)
-            {
-                List<Activities> activities = new List<Activities>();
-                Activities a = null;
-                comm.CommandText = $"SELECT * FROM Activities";
-                comm.Connection.Open();
-                SqlDataReader reader = comm.ExecuteReader();
-                while (reader.Read())
-                {
-                    a = new Activities()
-                    {
-                        ID = int.Parse(reader["ID"].ToString()),
-                        Name = reader["Name"].ToString(),
-                        RegionCode = int.Parse(reader["RegionCode"].ToString()),
-                        ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
-                        DueDate = reader["DueDate"].ToString(),
-                        Description = reader["Description"].ToString()
-                    };
-                    activities.Add(a);
-                }
-                comm.Connection.Close();
-                return activities;
-            }
-            else
-            {
-                List<Activities> activities = new List<Activities>();
-                Activities a = null;
-                comm.CommandText = $"SELECT * FROM Activities WHERE ActivityCode = {category}";
-                comm.Connection.Open();
-                SqlDataReader reader = comm.ExecuteReader();
-                while (reader.Read())
-                {
-                    a = new Activities()
-                    {
-                        ID = int.Parse(reader["ID"].ToString()),
-                        Name = reader["Name"].ToString(),
-                        RegionCode = int.Parse(reader["RegionCode"].ToString()),
-                        ActivityCode = int.Parse(reader["ActivityCode"].ToString()),
-                        DueDate = reader["DueDate"].ToString(),
-                        Description = reader["Description"].ToString()
-                    };
-                    activities.Add(a);
-                }
-                comm.Connection.Close();
-                return activities;
-            }
-        }
-        //שליפת ערכים ספציפים מטבלת קטגוריות לפי מס קטגוריה
-        public static List<Categories> GetCategoryTable(int CatID)
-        {
-            List<Categories> cats = new List<Categories>();
-            Categories c = null;
-            switch (CatID)
-            {
-                case 1:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=1";
-                    break;
-                case 2:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=2";
-                    break;
-                case 3:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=3";
-                    break;
-                case 4:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=4";
-                    break;
-                case 5:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=5";
-                    break;
-                case 6:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=6";
-                    break;
-                case 7:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=7";
-                    break;
-                case 8:
-                    comm.CommandText = $"SELECT * FROM Categories Where CategoryCode=8";
-                    break;
-            }
-            comm.Connection.Open();
-            SqlDataReader reader = comm.ExecuteReader();
-            while (reader.Read())
-            {
-                c = new Categories()
-                {
-                    ID = int.Parse(reader["ID"].ToString()),
-                    Name = reader["Name"].ToString(),
-                    RegionCode = int.Parse(reader["RegionCode"].ToString()),
-                    CategoryCode = int.Parse(reader["CategoryCode"].ToString()),
-                    Description = reader["Description"].ToString(),
-                    Phone = reader["Phone"].ToString(),
-                    Address = reader["Address"].ToString(),
-                };
-                cats.Add(c);
-            }
-            comm.Connection.Close();
-            return cats;
-        }
         //שליפת טבלת האזורים בארץ
         public static List<Regions> GetRegionsTable()
         {
@@ -363,7 +323,7 @@ namespace DALProj
             return regions;
         }
         //הרשמה של משתמש אל האפליקציה
-        public static User Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
+        public static User Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender, string img = "")
         {
             User u = null;
             SqlDataReader reader = null;
@@ -375,6 +335,19 @@ namespace DALProj
                 reader = comm.ExecuteReader();
                 if (reader.Read())
                 {
+                    u = new User()
+                    {
+                        UserID = int.Parse(reader["UserID"].ToString()),
+                        UserName = reader["UserName"].ToString(),
+                        Password = (string)reader["Password"],
+                        Email = reader["Email"].ToString(),
+                        Phone = reader["Phone"].ToString(),
+                        RegionCode = int.Parse(reader["RegionCode"].ToString()),
+                        Fname = reader["Fname"].ToString(),
+                        Lname = reader["Lname"].ToString(),
+                        Gender = reader["Gender"].ToString(),
+                        UserImage = reader["UserImage"].ToString()
+                    };
                     return u;
                 }
                 else
@@ -382,7 +355,7 @@ namespace DALProj
                     if (!reader.IsClosed)
                         reader.Close();
                     comm.CommandText = $"INSERT INTO Users(UserName,Password,Email,Fname,Lname,Phone,RegionCode,Gender,UserImage)VALUES" +
-                    $"('{userName}','{password}','{email}','{fName}','{lName}','{phone}',{regionCode},'{gender}','')";
+                    $"('{userName}','{password}','{email}','{fName}','{lName}','{phone}',{regionCode},'{gender}','{img}')";
                     int res = comm.ExecuteNonQuery();
                     if (res == 1)
                     {
@@ -400,7 +373,8 @@ namespace DALProj
                                 Lname = lName,
                                 Phone = phone,
                                 RegionCode = regionCode,
-                                Gender = gender
+                                Gender = gender,
+                                UserImage = img
                             };
                         }
                         return u;
@@ -424,6 +398,68 @@ namespace DALProj
             }
 
             return u;
+        }
+        //הרשמה של משתמש אל האפליקציה
+        public static Pets PetRegistration(string name, int age, int raceCode, bool isDog, int userCode, char gender, string vaccines, string img = "")
+        {
+            Pets p = null;
+            SqlDataReader reader = null;
+            //SqlDataReader reader2 = null;
+            try
+            {
+                //if (comm.Connection.State != ConnectionState.Closed) {
+                //    comm.Connection.Close();
+                //}
+                comm.CommandText = $"INSERT INTO PetDetails(Name,Age,RaceCode,IsDog,UserCode,Gender,Vaccines,Image)VALUES" +
+                $"('{name}',{age},{raceCode},'{isDog}',{userCode},'{gender}','{vaccines}','{img}')";
+                comm.Connection.Open();
+                int res = comm.ExecuteNonQuery();
+                if (res == 1)
+                {
+                    comm.CommandText = "SELECT max(PetID) as maxID FROM PetDetails";
+                    reader = comm.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        p = new Pets()
+                        {
+                            PetID = (int)reader["maxID"],
+                            Name = name,
+                            Age = age,
+                            RaceCode = raceCode,
+                            IsDog = isDog,
+                            UserCode = userCode,
+                            Gender = gender,
+                            Vaccines = vaccines,
+                            Gallery = new List<string>()
+                        };
+                        string path = HttpContext.Current.Server.MapPath("~/ImageStorage/Pets/" + p.PetID + @"/");
+                        string[] files = (Directory.Exists(path)) ? Directory.GetFiles(path) : new string[0];
+                        foreach (string file in files)
+                        {
+                            p.Gallery.Add(Path.GetFileName(file));
+                        }
+                        return p;
+                    }
+                }
+                
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                if (!reader.IsClosed)
+                    reader.Close();
+                if (comm.Connection.State != ConnectionState.Closed)
+                {
+                    comm.Connection.Close();
+                }
+
+            }
+
+            return p;
         }
         //התחברות משתמש אל האפליקציה
         public static User Login(string userNameOrEmail, string userPass)
@@ -515,6 +551,7 @@ namespace DALProj
             return u;
 
         }
+        //שליפת טבלת סוגי הקטגוריות
         public static List<CategoryTypes> GetCategoriesTypes()
         {
             List<CategoryTypes> categories = new List<CategoryTypes>();
@@ -526,9 +563,9 @@ namespace DALProj
             {
                 category = new CategoryTypes()
                 {
-                    MiscID = int.Parse(reader["MiscID"].ToString()),
-                    MiscName = reader["MiscName"].ToString(),
-                    CategoryImage = "Category/" + int.Parse(reader["MiscID"].ToString()) + "/1.jpg"
+                    CategoryID = int.Parse(reader["CategoryID"].ToString()),
+                    CategoryName = reader["CategoryName"].ToString(),
+                    CategoryImage = "Category/" + int.Parse(reader["CategoryID"].ToString()) + "/1.jpg"
                 };
                 categories.Add(category);
             }

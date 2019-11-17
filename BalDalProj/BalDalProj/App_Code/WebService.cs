@@ -22,9 +22,14 @@ public class WebService : System.Web.Services.WebService
         //InitializeComponent(); 
     }
     [WebMethod]
-    public string GetActivitiesTable(int category)
+    public string DeletePet(int pet_id)
     {
-        return BALServices.GetActivitiesTable(category);
+        return BALServices.DeletePet(pet_id);
+    }
+    [WebMethod]
+    public string ShowMyPets(int user_id)
+    {
+        return BALServices.ShowMyPets(user_id);
     }
     [WebMethod]
     public string GetCategoryTable(int CatID)
@@ -42,14 +47,9 @@ public class WebService : System.Web.Services.WebService
         return BALServices.GetPetRacesTable(isDog);
     }
     [WebMethod]
-    public string GetActivityTypesTable()
+    public string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender, string userImage = "")
     {
-        return BALServices.GetActivityTypesTable();
-    }
-    [WebMethod]
-    public string Registration(string userName, string password, string email, string fName, string lName, string phone, int regionCode, string gender)
-    {
-        return BALServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender);
+        return BALServices.Registration(userName, password, email, fName, lName, phone, regionCode, gender, userImage);
     }
     [WebMethod]
     public string Login(string userNameOrEmail, string userPass)
@@ -72,13 +72,13 @@ public class WebService : System.Web.Services.WebService
     }
     //Upload Pet Images 1=1.jpg 2=2.jpg ....
     [WebMethod]
-    public string SavePetImage(string petID, string base64, string imageName, string imageType,int imgNum)
+    public string SavePetImage(string petID, string base64, string imageName, string imageType)
     {
         string imgPath;
         try
         {
-            imgPath = StoreImage(base64, imageName, imageType, $"Pets/{petID}/{imgNum}");
-            return BALServices.SavePetImage2(petID, imgPath);
+            imgPath = StoreImage(base64, imageName, imageType, $"Pets/{petID}");
+            return imgPath; //BALServices.SavePetImage2(petID, imgPath);
         }
         catch (Exception e)
         {
@@ -90,7 +90,7 @@ public class WebService : System.Web.Services.WebService
     {
         return BALServices.UpdateUser(userID, password, email, phone, regionCode);
     }
-
+    //
     public string StoreImage(string base64, string imgName, string imageType, string folder)
     {
         try
@@ -119,7 +119,6 @@ public class WebService : System.Web.Services.WebService
             return e.Message;
         }
     }
-
     [WebMethod]
     public string GetPetsInfo(int isDog = -1, int regionId = 0, bool sortByAge = false, bool sortByGender = false)
     {
@@ -149,6 +148,11 @@ public class WebService : System.Web.Services.WebService
     public string GetCategoryDetails(int key)
     {
         return BALServices.GetCategoryDetails(key);
+    }
+    [WebMethod]
+    public string PetRegistration(string name, int age, int raceCode, bool isDog, int userCode, char gender, string vaccines, string img = "")
+    {
+        return BALServices.PetRegistration(name, age, raceCode, isDog, userCode, gender, vaccines, img = "");
     }
 }
 
