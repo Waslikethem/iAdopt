@@ -1,16 +1,15 @@
 import React from 'react';
-import { ImageBackground, Text, View, Image, Dimensions, StyleSheet, DrawerLayoutAndroid, ToolbarAndroid, ScrollView, TouchableOpacity,AsyncStorage, Alert } from 'react-native';
-import { ParallaxImage } from 'react-native-snap-carousel';
-import * as ImagePicker from "expo-image-picker";
-import { Button} from "react-native-elements";
+import { ImageBackground, Text, View, Image, Dimensions, StyleSheet, DrawerLayoutAndroid, ToolbarAndroid, ScrollView, TouchableOpacity, TouchableHighlight, FlatList, AsyncStorage, Alert } from 'react-native';
+import Carousel, { ParallaxImage, Pagination } from 'react-native-snap-carousel';
 const URL = "http://ruppinmobile.tempdomain.co.il/site02/WebService.asmx";
 const IMAGE_URL = "http://ruppinmobile.tempdomain.co.il/site02/ImageStorage/";
+import {NavigationEvents} from 'react-navigation';
 
 const { width: screenWidth } = Dimensions.get('window')
 
-export default class PublishPetsImages extends React.Component {
+export default class Home extends React.Component {
 
-    async componentDidMount() {
+    componentDidMount() {
         AsyncStorage.getItem("user", (err, result) => {
             if (result != null) {
                 this.setState({ user: JSON.parse(result) });
@@ -19,15 +18,10 @@ export default class PublishPetsImages extends React.Component {
                         profilePic: IMAGE_URL + this.state.user.UserImage,
                         userName: this.state.user.UserName,
                         userEmail: this.state.user.Email,
-                    });
+                    }, function () { console.log('HomePage - User', this.state.user), this.getCategoryTypes() });
             }
         });
-        AsyncStorage.getItem("thisPet", (err, result) => {
-            this.setState({ thisPet: JSON.parse(result) });
-            console.log("thisPet: ", this.state.thisPet);
-        });
     }
-
 
     constructor(props) {
         super(props);
@@ -39,121 +33,115 @@ export default class PublishPetsImages extends React.Component {
             userName: '',
             userEmail: '',
             profilePic: '',
-            //Screen
-            indexSpacer: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0',
-            selectedKind: 0,
-            switchValue: true,
-            //Images
-            img_1: IMAGE_URL + 'no_pet_image.png',
-            img_2: IMAGE_URL + 'no_pet_image.png',
-            img_3: IMAGE_URL + 'no_pet_image.png',
-            //PetDetails
-            isDog: true,
-            petName: 'null',
-            petGender: 'm',
-            petAge: 0,
-            petVaccines: '',
-            petRaces: [],
-            petRace: 0,
-            petImage: 'null',
-            selectedIndex: 0
-        };
+            //Categories
+            categoryTypes: [],
+            images: [
+                {
+                    name: "אלפא דוג",
+                    photo_url: IMAGE_URL + 'Category/6/' + 39 + "/1.jpg" + '?time' + new Date()
+                },
+                {
+                    name: 'זלאטן בחבורה',
+                    photo_url: IMAGE_URL + 'Category/1/' + 20 + "/1.jpg" + '?time' + new Date()
+                },
+                {
+                    name: 'שריטה',
+                    photo_url: IMAGE_URL + 'Pets/' + 5 + "/3.jpg" + '?time' + new Date()
+                },
+                {
+                    name: 'ביסלי',
+                    photo_url: IMAGE_URL + 'Pets/' + 3 + "/1.jpg" + '?time' + new Date()
+                },
+                {
+                    name: 'צימר יערות הדבש שבגליל',
+                    photo_url: IMAGE_URL + 'Category/3/' + 10 + "/1.jpg" + '?time' + new Date()
+                }
+            ],
+        }
+        this._renderItem = this._renderItem.bind(this);
+        this.onPress = this.ImagePress.bind(this);
+    };
+
+
+    getCategoryTypes = () => {
+        fetch(URL + "/GetCategoriesTypes", {
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json;"
+            }),
+            body: ''//JSON.stringify()
+        }).then(res => {
+            return res.json();
+        }).then(result => {
+            let c = JSON.parse(result.d);
+            if (c != null) {
+                this.setState({ categoryTypes: c }, function () { })
+
+            } else {
+                alert('error');
+            }
+        }, error => {
+            console.log("err post(categories types)=", error);
+        }).catch(function (error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
     }
 
+    renderCategory = ({ item }) => (
+        <TouchableHighlight underlayColor='rgba(255,255,255,0.4)' onPress={() => this.onPressCategory(item)} style={{ width: "50%" }}>
+            <View style={styles.categoriesItemContainer}>
+                <Image style={styles.categoriesPhoto} source={{ uri: IMAGE_URL + item.CategoryImage + '?time' + new Date() }} />
+                <Text style={styles.categoriesName}>{item.CategoryName}</Text>
+                {/*<Text style={styles.categoriesInfo}> recipes</Text>*/}
+            </View>
+        </TouchableHighlight>
+    );
+    onPressCategory = item => {
+        this.selectedCategory(item.CategoryID);
+    }
     openDrawer() {
         this.drawer.openDrawer();
     }
-
-    renderItem({ item, index }, parallaxProps) {
+    ImagePress() {
+        Alert.alert('implement nav');
+    }
+    _renderItem({ item, index }, parallaxProps) {
         return (
-            <View style={{ width: screenWidth - 60, height: screenWidth - 210 }} >
-                <ParallaxImage
-                    
-                    source={{ uri: IMAGE_URL + "Pets/" + item.PetID + "/" + 1 + ".jpg" + '?time' + new Date() }}
-                    containerStyle={{ flex: 1, borderRadius: 30 }}
-                    parallaxFactor={0.4}
-                    {...parallaxProps}
-                />
+            <View>
+                <TouchableOpacity onPress={this.onPress} >
+                    <View style={{ width: screenWidth - 60, height: screenWidth - 210 }}  >
+                        <ParallaxImage
+                            source={{ uri: item.photo_url }}
+                            containerStyle={{ flex: 1, borderRadius: 30 }}
+                            parallaxFactor={0.4}
+                            {...parallaxProps}
+
+                        />
+                    </View>
+                </TouchableOpacity>
+                <View>
+                    <Pagination
+                        activeDotIndex={index}
+                        dotsLength={this.state.images.length}
+                        inactiveDotColor={"black"}
+                        dotColor={'rgba(210, 41, 72, 1.0)'}
+                        inactiveDotOpacity={0.6}
+                        inactiveDotScale={0.60}
+                        dotContainerStyle={{ width: "3%" }}
+                        containerStyle={{ width: "100%", height: "1%" }}
+                    >
+                    </Pagination>
+                </View>
             </View>
+
         );
     }
-
-
-
-    btnOpenGallery = async (value) => {
-        console.log("value: ", value);
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 1,
-            base64: true
-        });
-        if(result.cancelled)
-        return
-        if (!result.canclelled) {
-            this.setState({
-                img: result.uri,
-                base64: result.base64,
-                imgType: 'jpg'
-            });
-            this.showImgUrl(value);
-        }
-    };
-    showImgUrl = (value) => {
-        const data = {
-            petID: this.state.thisPet.PetID,
-            base64: this.state.base64,
-            imageName: value,
-            imageType: this.state.imgType
-        }
-        console.log(data);
-        fetch(URL + '/SavePetImage', {
-            method: 'post',
-            headers: new Headers({
-                'Content-Type': 'application/json;',
-            }),
-            body: JSON.stringify(data)
-        }).then(res => {
-            return res.json()
-        }).then((result) => {
-            switch (value) {
-                case 1:
-                    this.setState({ img_1: IMAGE_URL + 'Pets/' + data.petID + '/1.jpg' })
-                    break;
-                case 2:
-                    this.setState({ img_2: IMAGE_URL + 'Pets/' + data.petID + '/2.jpg' })
-                    break;
-                case 3:
-                    this.setState({ img_3: IMAGE_URL + 'Pets/' + data.petID + '/3.jpg' })
-                    break;
-                default:
-                    break;
-            }
-
-        },
-            (error) => {
-                console.log("err post=", error);
-            });
-    }
-
-    uploadPet = () => {
-        if (this.state.img_1 != IMAGE_URL + 'no_pet_image.png' || this.state.img_2 != IMAGE_URL + 'no_pet_image.png' || this.state.img_3 != IMAGE_URL + 'no_pet_image.png') {
-            this.navToHome();
-        } else {
-            Alert.alert('הינך חייב להעלות תמונה אחת לפחות של החיה');
-        }
-
-    }
-
     //Drawer Navigation Section
     deleteAsyncStorage = async () => {
         AsyncStorage.clear();
         Alert.alert('התנתקת בהצלחה מהמערכת');
         this.navToLogin();
     }
-    navToHome = () => {
-        this.props.navigation.navigate("Home");
-    }
-
     navToLogin = () => {
         this.props.navigation.navigate("Login");
     }
@@ -175,8 +163,7 @@ export default class PublishPetsImages extends React.Component {
         }
     }
     render() {
-        const buttons = ['כלב/ה', 'חתול/ה']
-        const { selectedKind } = this.state
+        <NavigationEvents onDidFocus={() => console.log('I am triggered')} />
         var drawer = (
             <View style={{ backgroundColor: '#FFFF', flex: 1 }}>
                 <View >
@@ -255,25 +242,44 @@ export default class PublishPetsImages extends React.Component {
                         <Image Image source={require("../Images/logo.png")} style={{ right: 10, top: 34, position: 'absolute', width: 130, height: 35 }} />
                     </TouchableOpacity>
                     <DrawerLayoutAndroid renderNavigationView={() => drawer} drawerWidth={260}
-                        statusBarBackgroundColor='#FFFFFF' ref={_drawer => (this.drawer = _drawer)} drawerPosition={DrawerLayoutAndroid.positions.Left}>
+                        statusBarBackgroundColor='#FFFFFF' ref={_drawer => (this.drawer = _drawer)}
+                        DrawerLayoutAndroid={DrawerLayoutAndroid.positions.Left}
+                    >
                         <View>
                             <ToolbarAndroid style={styles.toolbar} navIcon={require('../Images/tIcon.png')} onIconClicked={this.openDrawer} />
                         </View>
                         <View style={{ width: '100%' }}>
                             <Image source={require("../Images/Shadow.png")} style={{ width: '100%', resizeMode: 'cover', height: 50 }}></Image>
                         </View>
-                        <View style={styles.container}>
-                            <View style={styles.imagesRowView}>
-                                <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => this.btnOpenGallery(1)}><Image style={{ width: 110, height: 110 }} source={{ uri: this.state.img_1 + '?time' + new Date() }} /></TouchableOpacity>
-                                <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => this.btnOpenGallery(2)}><Image style={{ width: 110, height: 110 }} source={{ uri: this.state.img_2 + '?time' + new Date() }} /></TouchableOpacity>
-                                <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => this.btnOpenGallery(3)}><Image style={{ width: 110, height: 110 }} source={{ uri: this.state.img_3 + '?time' + new Date() }} /></TouchableOpacity>
-                            </View>
-                            <View style={{ position: 'absolute', right: 120, left: 120, top: 425, bottom: 0 }}>
-                                <Button buttonStyle={{ backgroundColor: 'orange' }} title='סיים' onPress={this.uploadPet} />
-                            </View>
+                        <View style={{ height: 187 }}>
+                            <Carousel
+                                sliderWidth={screenWidth}
+                                sliderHeight={screenWidth}
+                                itemWidth={screenWidth - 60}
+                                data={this.state.images}
+                                renderItem={this._renderItem}
+                                hasParallaxImages={true}
+                                autoplay={true}
+                                autoplayInterval={2000}
+                                loop={true}
+                                marginTop={5} />
                         </View>
-
+                        <View style={{ justifyContent: "center", alignItems: "center", flex: 1, flexDirection: "column",marginBottom:15 }}>
+                            <FlatList
+                                data={this.state.categoryTypes}
+                                renderItem={this.renderCategory}
+                                keyExtractor={item => `${item.CategoryID}`}
+                                numColumns={2}
+                                marginTop={10} />
+                        </View>
+                        <TouchableOpacity
+                            onPress={this.navToPets}
+                            style={{ height: 50, width: screenWidth, /*borderRadius: 32,*/ backgroundColor: "#fff", justifyContent: "center", alignItems: "center", flexDirection: "row", marginTop: -15, paddingBottom: 15 }}>
+                            <Image source={require("../Images/dogIcon.png")} ></Image>
+                            <Text style={{ fontSize: 20, fontWeight: "400" }}>  אמץ בעל חיים</Text>
+                        </TouchableOpacity>
                     </DrawerLayoutAndroid>
+
                 </View >
             </ImageBackground>
         );
@@ -282,22 +288,7 @@ export default class PublishPetsImages extends React.Component {
 }
 
 
-
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-    viewRow: {
-        flexDirection: 'row'
-    },
-    imagesRowView: {
-        flexDirection: 'row',
-        margin: 10
-    },
     toolbar: {
         paddingTop: 10,
         height: 30,
@@ -309,14 +300,9 @@ const styles = StyleSheet.create({
         height: 31,
         zIndex: 999
     },
-    uppearScreen: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 80
-    },
     categoriesItemContainer: {
         flex: 1,
+        backgroundColor:'white',
         margin: 5,
         justifyContent: 'center',
         alignItems: 'center',
@@ -346,45 +332,6 @@ const styles = StyleSheet.create({
     categoriesInfo: {
         marginTop: 3,
         marginBottom: 5
-    },
-    checkBoxContainer: {
-        marginRight: 0,
-        marginLeft: 0,
-        width: 370,
-        flexDirection: 'row',
-        textAlign: 'center',
-        justifyContent: 'center',
-        //marginRight: 20
-    },
-    checkBoxText: {
-        marginRight: 0,
-        marginLeft: 0,
-        fontSize: 13,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        paddingTop: 12
-    },
-    cb: {
-        margin: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0,
-    },
-    imagesSlider: {
-        flexDirection: 'row',
-        textAlign: 'center',
-        justifyContent: 'center',
-    },
-    modalScreen: {
-        flex: 0.82,
-        backgroundColor: '#fff8dc',
-        //borderRadius:2,
-        //borderColor:'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 350,
-        margin: 5,
-        marginTop: 90
     },
     menuIcos: {
         width: 25,
